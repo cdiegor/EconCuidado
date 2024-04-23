@@ -80,16 +80,17 @@ preprocessamento <- function(pnadfile)
   
   # Faixas etárias
   pnadc$faixa_etaria = pnadc$idade
-  pnadc$faixa_etaria[pnadc$idade>=14 & pnadc$idade<=30] = "Jovem"
-  pnadc$faixa_etaria[pnadc$idade>=30 & pnadc$idade<=50] = "Pleno"
+  pnadc$faixa_etaria[pnadc$idade>=14 & pnadc$idade<=24] = "Jovem"
+  pnadc$faixa_etaria[pnadc$idade>=25 & pnadc$idade<=29] = "Junior"
+  pnadc$faixa_etaria[pnadc$idade>=30 & pnadc$idade<=49] = "Pleno"
   pnadc$faixa_etaria[pnadc$idade>=50 & pnadc$idade<=64] = "Senior"
   pnadc$faixa_etaria[pnadc$idade>=65] = "Idoso"
   
   # Renda média habitual de todos os trabalhos (VD4019)
   pnadc$rendatrabtotal = pnadc$VD4019 * pnadc$Habitual 
   
-  # Renda média habitual do trabalho principal (VD4019)
-  pnadc$rendatrabprincipal = pnadc$VD4016 * pnadc$Habitual 
+  # Renda média habitual do trabalho principal (VD4016)
+  #pnadc$rendatrabtotal = pnadc$VD4016 * pnadc$Habitual 
   
   
   # Pessoas na força de trabalho
@@ -98,42 +99,40 @@ preprocessamento <- function(pnadfile)
   # Pessoas ocupadas e não ocupadas
   pnadc$ocupadas = pnadc$VD4002
   
-  # Carteira assinada
-  pnadc$contribuicao = pnadc$V4029
+  # Contribuição previdenciária
+  pnadc$contribuicao = pnadc$VD4012
   
-  # Horas habitualmente trabalhadas no trabalho principal
-  pnadc$horas_principal = pnadc$V4039
-  
-  # Horas habitualmente trabalhadas em todos os trabalhos
-  pnadc$horas_total = pnadc$VD4031
+  # Horas habitualmente trabalhadas
+  pnadc$horas = pnadc$V4039
   
   # Posição na ocupação
   pnadc$posicao = pnadc$V4010
   
   
-  pnadc$posicao[pnadc$V4010 >= 1111 & pnadc$V4010 <= 1439] = "Diretores e gerentes"
-  pnadc$posicao[pnadc$V4010 >= 2111 & pnadc$V4010 <= 2659] = "Profissionais das ciências e intelectuais"
-  pnadc$posicao[pnadc$V4010 >= 3111 & pnadc$V4010 <= 3522] = "Técnicos e profissionais de nível médio"
-  pnadc$posicao[pnadc$V4010 >= 4110 & pnadc$V4010 <= 4419] = "Trabalhadores de apoio administrativo"
-  pnadc$posicao[pnadc$V4010 >= 5111 & pnadc$V4010 <= 5419] = "Trabalhadores dos serviços, vendedores dos comércios e mercados"
-  pnadc$posicao[pnadc$V4010 >= 6111 & pnadc$V4010 <= 6225] = "Trabalhadores qualificados da agropecuária, florestais, da caça e da pesca"
-  pnadc$posicao[pnadc$V4010 >= 7111 & pnadc$V4010 <= 7549] = "Trabalhadores qualificados, operários e artesões da construção, das artes mecânicas e outros ofícios"
-  pnadc$posicao[pnadc$V4010 >= 8111 & pnadc$V4010 <= 8350] = "Operadores de instalações e máquinas e montadores"
-  pnadc$posicao[pnadc$V4010 >= 9111 & pnadc$V4010 <= 9629] = "Ocupações elementares"
-  pnadc$posicao[pnadc$V4010 >= 0110 & pnadc$V4010 <= 0512] = "Membros das forças armadas, policiais e bombeiros militares"
+  pnadc$posicao[as.numeric(pnadc$V4010) >= 1111 & as.numeric(pnadc$V4010) <= 1439] = "Dirigentes e gerentes"
+  pnadc$posicao[as.numeric(pnadc$V4010) >= 2111 & as.numeric(pnadc$V4010) <= 2659] = "Profissionais das ciências e intelectuais"
+  pnadc$posicao[as.numeric(pnadc$V4010) >= 3111 & as.numeric(pnadc$V4010) <= 3522] = "Técnicos e profissionais de nível médio"
+  pnadc$posicao[as.numeric(pnadc$V4010) >= 4110 & as.numeric(pnadc$V4010) <= 4419] = "Trabalhadores de apoio administrativo"
+  pnadc$posicao[as.numeric(pnadc$V4010) >= 5111 & as.numeric(pnadc$V4010) <= 5419] = "Trabalhadores dos serviços, vendedores dos comércios e mercados"
+  pnadc$posicao[as.numeric(pnadc$V4010) >= 6111 & as.numeric(pnadc$V4010) <= 6225] = "Trabalhadores qualificados da agropecuária, florestais, da caça e da pesca"
+  pnadc$posicao[as.numeric(pnadc$V4010) >= 7111 & as.numeric(pnadc$V4010) <= 7549] = "Trabalhadores qualificados, operários e artesões da construção, das artes mecânicas e outros ofícios"
+  pnadc$posicao[as.numeric(pnadc$V4010) >= 8111 & as.numeric(pnadc$V4010) <= 8350] = "Operadores de instalações e máquinas e montadores"
+  pnadc$posicao[as.numeric(pnadc$V4010) >= 9111 & as.numeric(pnadc$V4010) <= 9629] = "Ocupações elementares"
+  pnadc$posicao[as.numeric(pnadc$V4010) >= 110 & as.numeric(pnadc$V4010) <= 512] = "Membros das forças armadas, policiais e bombeiros militares"
   
   # Atividade no trabalho principal
-  pnadc$atividade = pnadc$V4012
+  pnadc$atividade = pnadc$V4013
   
-  #pnadc$atividade[pnadc$V4013 >= 01101 & pnadc$V4013 <= 03002] = "Agricultura, pecuária, produção florestal, pesca e aquicultura"
-  #pnadc$atividade[pnadc$V4013 >= 05000 & pnadc$V4013 <= 39000] = "Indústria geral"
-  #pnadc$atividade[pnadc$V4013 >= 41000 & pnadc$V4013 <= 43000] = "Construção"
-  #pnadc$atividade[pnadc$V4013 >= 45010 & pnadc$V4013 <= 48100] = "Comércio, reparação de veículos automotores e motocicletas"
-  #pnadc$atividade[pnadc$V4013 >= 49010 & pnadc$V4013 <= 53002] = "Transporte, armazenagem e correio"
-  #pnadc$atividade[pnadc$V4013 >= 55000 & pnadc$V4013 <= 56020] = "Alojamento e alimentação"
-  #pnadc$atividade[pnadc$V4013 >= 58000 & pnadc$V4013 <= 82009] = "Informação, comunicação e atividades financeiras, imobiliárias, profissionais e administrativas"
-  #pnadc$atividade[pnadc$V4013 >= 84011 & pnadc$V4013 <= 88000] = "Administração pública, defesa e seguridade social, educação, saúde humana e serviços sociais"
-  #pnadc$atividade[pnadc$V4013 >= 97000 & pnadc$V4013 <= 97000] = "Serviços domésticos"
+  pnadc$atividade[as.numeric(pnadc$V4013) >=  1101 & as.numeric(pnadc$V4013) <=  3002] <- "Agricultura, pecuária, produção florestal, pesca e aquicultura"
+  pnadc$atividade[as.numeric(pnadc$V4013) >=  5000 & as.numeric(pnadc$V4013) <= 39000] <- "Indústria"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 41000 & as.numeric(pnadc$V4013) <= 43000] <- "Construção"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 45010 & as.numeric(pnadc$V4013) <= 48100] <- "Comércio, reparação de veículos automotores e motocicletas"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 49010 & as.numeric(pnadc$V4013) <= 53002] <- "Transporte, armazenagem e correio"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 55000 & as.numeric(pnadc$V4013) <= 56020] <- "Alojamento e alimentação"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 58000 & as.numeric(pnadc$V4013) <= 82009] <- "Informação, comunicação e atividades financeiras, imobiliárias, profissionais e administrativas"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 84011 & as.numeric(pnadc$V4013) <= 88000] <- "Administração pública, defesa e seguridade social, educação, saúde humana e serviços sociais"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 90000 & as.numeric(pnadc$V4013) <= 96090 | as.numeric(pnadc$V4013) == 99000] <- "Outros serviços"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 97000 & as.numeric(pnadc$V4013) <= 97000] <- "Serviços domésticos"
   
   # Grandes regiões
   pnadc$regioes = factor(
