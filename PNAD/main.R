@@ -21,7 +21,7 @@ pnads <- c("PNADC_012021", "PNADC_022021", "PNADC_032021", "PNADC_042021",
            "PNADC_012022", "PNADC_022022", "PNADC_032022", "PNADC_042022",
            "PNADC_012023", "PNADC_022023", "PNADC_032023", "PNADC_042023")
 
-todas_as_taxas(pnads)
+todas_as_funcoes(pnads)
 
 
 

@@ -23,6 +23,12 @@ preprocessamento <- function(pnadfile)
   # Abrindo os dados
   pnadc <- as_tibble(readRDS(file = pnadfile))
   
+  inicial <- ncol(pnadc)  
+
+  #Pesos calibrados
+  pnadc$pesoscalibrados = pnadc$V1028
+
+  
   # Idade
   pnadc$idade = pnadc$V2009
   
@@ -155,6 +161,12 @@ preprocessamento <- function(pnadfile)
   # Escolaridade
   pnadc$escolaridade = as.numeric(gsub("([0-9]+).*$", "\\1", pnadc$VD3005))
   #pnadc %>% mutate(escolaridade=parse_number(escolaridade))
+  
+  final <- ncol(pnadc)
+  
+  n <- final - inicial
+  
+  pnadc = pnadc[,(ncol(pnadc)-n-1):ncol(pnadc)]
   
   return (pnadc)
   
