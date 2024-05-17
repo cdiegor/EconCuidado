@@ -1,29 +1,50 @@
-
+options(OutDec= ",")
 
 
 taxas <- function(pnadc)
 {
-  total_lsir <- sum(pnadc$pesoscalibrados)
-  ocupadas_lsir <- sum(subset(pnadc, (pnadc$ocupadas=="Pessoas ocupadas") & (pnadc$forca=="Pessoas na força de trabalho") )$pesoscalibrados )  
-  forca_lsir <- sum(subset(pnadc,  (pnadc$forca=="Pessoas na força de trabalho") )$pesoscalibrados )
-  taxa_lsir <- 100 * (1 - ocupadas_lsir/forca_lsir)
-  nivel_lsir <- 100*ocupadas_lsir/total_lsir
+  
+  total_lsir        <- sum(pnadc$pesoscalibrados)
+  ocupadas_lsir     <- sum(subset(pnadc, (pnadc$ocupadas=="Pessoas ocupadas") & (pnadc$forca=="Pessoas na força de trabalho") )$pesoscalibrados )  
+  forca_lsir        <- sum(subset(pnadc,  (pnadc$forca=="Pessoas na força de trabalho") )$pesoscalibrados )
+  taxa_lsir         <- 100 * (1 - ocupadas_lsir/forca_lsir)
+  nivel_lsir        <- 100*ocupadas_lsir/total_lsir
   participacao_lsir <- 100*forca_lsir/total_lsir
   
-  return (paste(total_lsir, ";", ocupadas_lsir, ";", forca_lsir, ";", taxa_lsir, ";", nivel_lsir, ";", participacao_lsir))
+  return (paste(
+                  format(round(total_lsir, 0), nsmall = 0), ";", 
+                  format(round(ocupadas_lsir, 0), nsmall = 0), ";", 
+                  format(round(forca_lsir, 0), nsmall = 0), ";", 
+                  format(round(taxa_lsir, 2), nsmall = 0), ";", 
+                  format(round(nivel_lsir, 2), nsmall = 2), ";", 
+                  format(round(participacao_lsir, 2), nsmall = 2)))
 }
 
 rendas <- function(pnadc)
 {
   
   total_lsir <- nrow(subset(pnadc))
-  renda_media <- weighted.mean(pnadc$rendatrabtotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+  renda_media_hab_principal <- weighted.mean(pnadc$rendahabprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+  renda_media_efe_principal <- weighted.mean(pnadc$rendaefeprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+  renda_media_hab_total <- weighted.mean(pnadc$rendahabtotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+  renda_media_efe_total <- weighted.mean(pnadc$rendaefetotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+
+  horas_hab_principal <- weighted.mean(pnadc$horashabprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+  horas_efe_principal <- weighted.mean(pnadc$horashabprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+  horas_hab_total <- weighted.mean(pnadc$horashabtotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+  horas_efe_total <- weighted.mean(pnadc$horashabtotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
   
-  escolar <- weighted.mean(pnadc$escolaridade, w = pnadc$pesoscalibrados, na.rm = TRUE)
+  escolaridade <- weighted.mean(pnadc$escolaridade, w = pnadc$pesoscalibrados, na.rm = TRUE)
   
-  horas <- weighted.mean(pnadc$horas, w = pnadc$pesoscalibrados, na.rm = TRUE)
-  
-  return (paste(renda_media, ";", escolar, ";", horas))
+  return (paste(format(round(renda_media_hab_principal, 2), nsmall = 2), ";", 
+                format(round(renda_media_efe_principal, 2), nsmall = 2), ";",
+                format(round(renda_media_hab_total, 2), nsmall = 2), ";",
+                format(round(renda_media_efe_total, 2), nsmall = 2), ";",
+                format(round(horas_hab_principal, 2), nsmall = 2), ";", 
+                format(round(horas_efe_principal, 2), nsmall = 2), ";",
+                format(round(horas_hab_total, 2), nsmall = 2), ";", 
+                format(round(horas_efe_total, 2), nsmall = 2), ";",
+                format(round(escolaridade, 2), nsmall = 2)))
   
 }
 
@@ -67,7 +88,11 @@ todas_as_atividades <- function(pnads)
                "Contribuição previdenciária?;", "Posição;", "Principal atividade;", 
                "Pessoas em idade ativa;", "Pessoas ocupadas;", "Força de trabalho;", 
                "Taxa de desocupação;", "Nível da ocupação;", "Participação;", 
-               "Renda habitual;", "Escolaridade;", "Horas trabalhadas",  "\n"),
+               "Renda habitual trabalho principal;", "Renda efetiva trabalho principal;",
+               "Renda habitual total;", "Renda efetiva total;",
+               "Horas habitualmente trabalhadas (principal);", "Horas efetivamente trabalhadas (principal);",
+               "Horas habitualmente trabalhadas (total);", "Horas efetivamente trabalhadas (total);",
+               "Escolaridade", "\n"),
         file = "resultados_atividades.csv",
         append = FALSE )
   
@@ -123,7 +148,8 @@ todas_as_atividades <- function(pnads)
                 {
                   # Setor econômico da atividade
                   pnsuba <- subset(pnsubp,  ( (atividade_ == "") | (atividade == atividade_ ) ) )  
-                  
+                  if (local_ == "")
+                    local <- "Brasil"
                   cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                               contribuicao_, ";", posicao_, ";", atividade_, ";",
                               taxas(pnsuba),";", 
@@ -175,7 +201,11 @@ todas_as_funcoes <- function(pnads)
                "Função;", "Especificação;",
                "Pessoas em idade ativa;", "Pessoas ocupadas;", "Força de trabalho;", 
                "Taxa de desocupação;", "Nível da ocupação;", "Participação;", 
-               "Renda habitual;", "Escolaridade;", "Horas trabalhadas",  "\n"),
+               "Renda habitual trabalho principal;", "Renda efetiva trabalho principal;",
+               "Renda habitual total;", "Renda efetiva total;",
+               "Horas habitualmente trabalhadas (principal);", "Horas efetivamente trabalhadas (principal);",
+               "Horas habitualmente trabalhadas (total);", "Horas efetivamente trabalhadas (total);",
+               "Escolaridade", "\n"),
         file = "resultados_funcoes.csv",
         append = FALSE )
   
@@ -230,6 +260,8 @@ todas_as_funcoes <- function(pnads)
                   pnsubespe <- subset(pnsubfuncao,  ( (especificacao_ == "") | (CNPJ == especificacao_ ) ) )
                   if (especificacao_ == "Sim") especificacao_ <- "Com CNPJ"
                   if (especificacao_ == "Não") especificacao_ <- "Sem CNPJ"
+                  if (local_ == "")
+                    local <- "Brasil"
                   cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                               funcao_, ";", especificacao_, ";", 
                               taxas(pnsubespe),";", 

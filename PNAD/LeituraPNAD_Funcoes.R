@@ -8,7 +8,7 @@ leitura <- function(pnadtxt)
   # Leitura e salvamento dos dados
   pnadc <- read_pnadc(pnadtxt, "input_PNADC_trimestral.txt")
   pnadc <- pnadc_labeller(data_pnadc=pnadc, "dicionario_PNADC_microdados_trimestral.xls")
-  pnadc <- pnadc_deflator(pnadc, "deflator_PNADC_2023_trimestral_101112.xls")
+  pnadc <- pnadc_deflator(pnadc, "deflator_PNADC_2024_trimestral_010203.xls")
   
   pnadfile = substring(pnadtxt, 1, nchar(pnadtxt)-4)
   
@@ -93,10 +93,12 @@ preprocessamento <- function(pnadfile)
   pnadc$faixa_etaria[pnadc$idade>=65] = "Idoso"
   
   # Renda média habitual de todos os trabalhos (VD4019)
-  pnadc$rendatrabtotal = pnadc$VD4019 * pnadc$Habitual 
+  pnadc$rendahabtotal = pnadc$VD4019 * pnadc$Habitual 
+  pnadc$rendaefetotal = pnadc$VD4020 * pnadc$Efetivo
   
   # Renda média habitual do trabalho principal (VD4016)
-  #pnadc$rendatrabtotal = pnadc$VD4016 * pnadc$Habitual 
+  pnadc$rendahabprincipal = pnadc$VD4016 * pnadc$Habitual 
+  pnadc$rendaefeprincipal = pnadc$VD4017 * pnadc$Efetivo 
   
   
   # Pessoas na força de trabalho
@@ -109,7 +111,10 @@ preprocessamento <- function(pnadfile)
   pnadc$contribuicao = pnadc$VD4012
   
   # Horas habitualmente trabalhadas
-  pnadc$horas = pnadc$V4039
+  pnadc$horashabprincipal = pnadc$V4039
+  pnadc$horasefeprincipal = pnadc$V4039C
+  pnadc$horashabtotal = pnadc$VD4031
+  pnadc$horasefetotal = pnadc$VD4032
   
   # Posição na ocupação
   pnadc$posicao = pnadc$V4010
