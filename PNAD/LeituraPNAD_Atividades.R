@@ -142,7 +142,30 @@ preprocessamento <- function(pnadfile)
   pnadc$atividade[as.numeric(pnadc$V4013) >= 84011 & as.numeric(pnadc$V4013) <= 88000] <- "Administração pública, defesa e seguridade social, educação, saúde humana e serviços sociais"
   pnadc$atividade[as.numeric(pnadc$V4013) >= 90000 & as.numeric(pnadc$V4013) <= 96090 | as.numeric(pnadc$V4013) == 99000] <- "Outros serviços"
   pnadc$atividade[as.numeric(pnadc$V4013) >= 97000 & as.numeric(pnadc$V4013) <= 97000] <- "Serviços domésticos"
-  
+   
+  # Divisão em grupamentostividade no trabalho principal - correspondência Isic 4 x CNAE20
+  pnadc$atividade[as.numeric(pnadc$V4013) >=  1000 & as.numeric(pnadc$V4013) <=  3220] <- "A: Agricultura, pecuária, produção florestal, pesca e aquicultura"
+  pnadc$atividade[as.numeric(pnadc$V4013) >=  5000 & as.numeric(pnadc$V4013) <=  9900] <- "B: Indústrias extrativas"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 10000 & as.numeric(pnadc$V4013) <= 33200] <- "C: Indústrias de transformação"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 35000 & as.numeric(pnadc$V4013) <= 35300] <- "D: Eletricidade e gás"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 36000 & as.numeric(pnadc$V4013) <= 39000] <- "E: Água, esgoto, atividades de gestão de resíduos e descontaminação"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 41000 & as.numeric(pnadc$V4013) <= 43900] <- "F: Construção"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 45000 & as.numeric(pnadc$V4013) <= 47990] <- "G: Comércio; reparação de veículos automotores e motocicletas"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 49000 & as.numeric(pnadc$V4013) <= 53200] <- "H: Transporte, armazenagem e correio"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 55000 & as.numeric(pnadc$V4013) <= 56300] <- "I: Alojamento e alimentação"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 58000 & as.numeric(pnadc$V4013) <= 63990] <- "J: Informação e comunicação"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 64000 & as.numeric(pnadc$V4013) <= 66300] <- "K: Atividades financeiras, de seguro e serviços relacionados"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 68000 & as.numeric(pnadc$V4013) <= 68200] <- "L: Atividades imobiliárias"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 69000 & as.numeric(pnadc$V4013) <= 75000] <- "M: Atividades profissionais, científicas e técnicas"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 77000 & as.numeric(pnadc$V4013) <= 82990] <- "N: Atividades administrativas e serviços complementares"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 84000 & as.numeric(pnadc$V4013) <= 84300] <- "O: Administração pública, defesa e seguridade social"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 85000 & as.numeric(pnadc$V4013) <= 85500] <- "P: Educação"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 86000 & as.numeric(pnadc$V4013) <= 88900] <- "Q: Saúde humana e serviços sociais"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 90000 & as.numeric(pnadc$V4013) <= 93290] <- "R: Artes, cultura, esporte e recreação"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 94000 & as.numeric(pnadc$V4013) <= 96090] <- "S: Outras atividades de serviço"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 97000 & as.numeric(pnadc$V4013) <= 98200] <- "T: Serviços domésticos"
+  pnadc$atividade[as.numeric(pnadc$V4013) >= 99000 & as.numeric(pnadc$V4013) <= 99000] <- "U: Organismos internacionais e outras instituições extraterritoriais"
+  pnadc$atividade[as.numeric(pnadc$V4013) = 00000] <- "V: Atividades maldefinidas"
   
   
   
