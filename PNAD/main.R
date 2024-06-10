@@ -48,3 +48,6 @@ todas_as_funcoes(pnads)
 todas_as_atividades(pnads)
 
 
+todas_as_posicoes(pnads)
+
+

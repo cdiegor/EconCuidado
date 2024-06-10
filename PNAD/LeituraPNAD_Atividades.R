@@ -23,6 +23,11 @@ preprocessamento <- function(pnadfile)
   # Abrindo os dados
   pnadc <- as_tibble(readRDS(file = pnadfile))
   
+  inicial <- ncol(pnadc)
+  
+  #Pesos calibrados
+  pnadc$pesoscalibrados = pnadc$V1028
+  
   # Idade
   pnadc$idade = pnadc$V2009
   
@@ -86,8 +91,14 @@ preprocessamento <- function(pnadfile)
   pnadc$faixa_etaria[pnadc$idade>=50 & pnadc$idade<=64] = "Senior"
   pnadc$faixa_etaria[pnadc$idade>=65] = "Idoso"
   
+  
   # Renda média habitual de todos os trabalhos (VD4019)
-  pnadc$rendatrabtotal = pnadc$VD4019 * pnadc$Habitual 
+  pnadc$rendahabtotal = pnadc$VD4019 * pnadc$Habitual 
+  pnadc$rendaefetotal = pnadc$VD4020 * pnadc$Efetivo
+  
+  # Renda média habitual do trabalho principal (VD4016)
+  pnadc$rendahabprincipal = pnadc$VD4016 * pnadc$Habitual 
+  pnadc$rendaefeprincipal = pnadc$VD4017 * pnadc$Efetivo 
   
   # Renda média habitual do trabalho principal (VD4016)
   #pnadc$rendatrabtotal = pnadc$VD4016 * pnadc$Habitual 
@@ -103,7 +114,10 @@ preprocessamento <- function(pnadfile)
   pnadc$contribuicao = pnadc$VD4012
   
   # Horas habitualmente trabalhadas
-  pnadc$horas = pnadc$V4039
+  pnadc$horashabprincipal = pnadc$V4039
+  pnadc$horasefeprincipal = pnadc$V4039C
+  pnadc$horashabtotal = pnadc$VD4031
+  pnadc$horasefetotal = pnadc$VD4032
   
   # Posição na ocupação
   pnadc$posicao = pnadc$V4010
@@ -142,30 +156,32 @@ preprocessamento <- function(pnadfile)
   pnadc$atividade[as.numeric(pnadc$V4013) >= 84011 & as.numeric(pnadc$V4013) <= 88000] <- "Administração pública, defesa e seguridade social, educação, saúde humana e serviços sociais"
   pnadc$atividade[as.numeric(pnadc$V4013) >= 90000 & as.numeric(pnadc$V4013) <= 96090 | as.numeric(pnadc$V4013) == 99000] <- "Outros serviços"
   pnadc$atividade[as.numeric(pnadc$V4013) >= 97000 & as.numeric(pnadc$V4013) <= 97000] <- "Serviços domésticos"
+  
+  pnadc$grupamento = pnadc$atividade
    
   # Divisão em grupamentostividade no trabalho principal - correspondência Isic 4 x CNAE20
-  pnadc$atividade[as.numeric(pnadc$V4013) >=  1000 & as.numeric(pnadc$V4013) <=  3220] <- "A: Agricultura, pecuária, produção florestal, pesca e aquicultura"
-  pnadc$atividade[as.numeric(pnadc$V4013) >=  5000 & as.numeric(pnadc$V4013) <=  9900] <- "B: Indústrias extrativas"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 10000 & as.numeric(pnadc$V4013) <= 33200] <- "C: Indústrias de transformação"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 35000 & as.numeric(pnadc$V4013) <= 35300] <- "D: Eletricidade e gás"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 36000 & as.numeric(pnadc$V4013) <= 39000] <- "E: Água, esgoto, atividades de gestão de resíduos e descontaminação"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 41000 & as.numeric(pnadc$V4013) <= 43900] <- "F: Construção"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 45000 & as.numeric(pnadc$V4013) <= 47990] <- "G: Comércio; reparação de veículos automotores e motocicletas"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 49000 & as.numeric(pnadc$V4013) <= 53200] <- "H: Transporte, armazenagem e correio"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 55000 & as.numeric(pnadc$V4013) <= 56300] <- "I: Alojamento e alimentação"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 58000 & as.numeric(pnadc$V4013) <= 63990] <- "J: Informação e comunicação"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 64000 & as.numeric(pnadc$V4013) <= 66300] <- "K: Atividades financeiras, de seguro e serviços relacionados"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 68000 & as.numeric(pnadc$V4013) <= 68200] <- "L: Atividades imobiliárias"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 69000 & as.numeric(pnadc$V4013) <= 75000] <- "M: Atividades profissionais, científicas e técnicas"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 77000 & as.numeric(pnadc$V4013) <= 82990] <- "N: Atividades administrativas e serviços complementares"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 84000 & as.numeric(pnadc$V4013) <= 84300] <- "O: Administração pública, defesa e seguridade social"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 85000 & as.numeric(pnadc$V4013) <= 85500] <- "P: Educação"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 86000 & as.numeric(pnadc$V4013) <= 88900] <- "Q: Saúde humana e serviços sociais"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 90000 & as.numeric(pnadc$V4013) <= 93290] <- "R: Artes, cultura, esporte e recreação"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 94000 & as.numeric(pnadc$V4013) <= 96090] <- "S: Outras atividades de serviço"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 97000 & as.numeric(pnadc$V4013) <= 98200] <- "T: Serviços domésticos"
-  pnadc$atividade[as.numeric(pnadc$V4013) >= 99000 & as.numeric(pnadc$V4013) <= 99000] <- "U: Organismos internacionais e outras instituições extraterritoriais"
-  pnadc$atividade[as.numeric(pnadc$V4013) = 00000] <- "V: Atividades maldefinidas"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >=  1000 & as.numeric(pnadc$V4013) <=  3220] <- "A: Agricultura, pecuária, produção florestal, pesca e aquicultura"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >=  5000 & as.numeric(pnadc$V4013) <=  9900] <- "B: Indústrias extrativas"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 10000 & as.numeric(pnadc$V4013) <= 33200] <- "C: Indústrias de transformação"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 35000 & as.numeric(pnadc$V4013) <= 35300] <- "D: Eletricidade e gás"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 36000 & as.numeric(pnadc$V4013) <= 39000] <- "E: Água, esgoto, atividades de gestão de resíduos e descontaminação"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 41000 & as.numeric(pnadc$V4013) <= 43900] <- "F: Construção"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 45000 & as.numeric(pnadc$V4013) <= 47990] <- "G: Comércio; reparação de veículos automotores e motocicletas"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 49000 & as.numeric(pnadc$V4013) <= 53200] <- "H: Transporte, armazenagem e correio"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 55000 & as.numeric(pnadc$V4013) <= 56300] <- "I: Alojamento e alimentação"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 58000 & as.numeric(pnadc$V4013) <= 63990] <- "J: Informação e comunicação"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 64000 & as.numeric(pnadc$V4013) <= 66300] <- "K: Atividades financeiras, de seguro e serviços relacionados"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 68000 & as.numeric(pnadc$V4013) <= 68200] <- "L: Atividades imobiliárias"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 69000 & as.numeric(pnadc$V4013) <= 75000] <- "M: Atividades profissionais, científicas e técnicas"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 77000 & as.numeric(pnadc$V4013) <= 82990] <- "N: Atividades administrativas e serviços complementares"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 84000 & as.numeric(pnadc$V4013) <= 84300] <- "O: Administração pública, defesa e seguridade social"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 85000 & as.numeric(pnadc$V4013) <= 85500] <- "P: Educação"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 86000 & as.numeric(pnadc$V4013) <= 88900] <- "Q: Saúde humana e serviços sociais"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 90000 & as.numeric(pnadc$V4013) <= 93290] <- "R: Artes, cultura, esporte e recreação"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 94000 & as.numeric(pnadc$V4013) <= 96090] <- "S: Outras atividades de serviço"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 97000 & as.numeric(pnadc$V4013) <= 98200] <- "T: Serviços domésticos"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 99000 & as.numeric(pnadc$V4013) <= 99000] <- "U: Organismos internacionais e outras instituições extraterritoriais"
+  pnadc$grupamento[as.numeric(pnadc$V4013) == 00000] <- "V: Atividades maldefinidas"
   
   
   
@@ -178,6 +194,12 @@ preprocessamento <- function(pnadfile)
   # Escolaridade
   pnadc$escolaridade = as.numeric(gsub("([0-9]+).*$", "\\1", pnadc$VD3005))
   #pnadc %>% mutate(escolaridade=parse_number(escolaridade))
+  
+  final <- ncol(pnadc)
+  
+  n <- final - inicial
+  
+  pnadc = pnadc[,(ncol(pnadc)-n-1):ncol(pnadc)]
   
   return (pnadc)
   
