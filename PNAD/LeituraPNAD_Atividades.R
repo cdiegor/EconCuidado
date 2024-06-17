@@ -195,6 +195,8 @@ preprocessamento <- function(pnadfile)
   pnadc$escolaridade = as.numeric(gsub("([0-9]+).*$", "\\1", pnadc$VD3005))
   #pnadc %>% mutate(escolaridade=parse_number(escolaridade))
   
+  pnadc$resposta <- pnadc$V4074A
+  
   final <- ncol(pnadc)
   
   n <- final - inicial
