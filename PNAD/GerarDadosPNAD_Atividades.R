@@ -1,29 +1,35 @@
 
-
+quant_fora_forca <- function(pnadc)
+{
+  total <- sum(pnadc$pesoscalibrados)
+  return (paste(
+    format(round(total, 0), nsmall = 0), ";"
+                ) )
+}
 
 taxas <- function(pnadc)
 {
   
-  total_lsir        <- sum(pnadc$pesoscalibrados)
-  ocupadas_lsir     <- sum(subset(pnadc, (pnadc$ocupadas=="Pessoas ocupadas") & (pnadc$forca=="Pessoas na força de trabalho") )$pesoscalibrados )  
-  forca_lsir        <- sum(subset(pnadc,  (pnadc$forca=="Pessoas na força de trabalho") )$pesoscalibrados )
-  taxa_lsir         <- 100 * (1 - ocupadas_lsir/forca_lsir)
-  nivel_lsir        <- 100*ocupadas_lsir/total_lsir
-  participacao_lsir <- 100*forca_lsir/total_lsir
+  total        <- sum(pnadc$pesoscalibrados)
+  ocupadas     <- sum(subset(pnadc, (pnadc$ocupadas=="Pessoas ocupadas") & (pnadc$forca=="Pessoas na força de trabalho") )$pesoscalibrados )  
+  forca        <- sum(subset(pnadc,  (pnadc$forca=="Pessoas na força de trabalho") )$pesoscalibrados )
+  taxa         <- 100 * (1 - ocupadas/forca)
+  nivel        <- 100*ocupadas/total
+  participacao <- 100*forca/total
   
   return (paste(
-    format(round(total_lsir, 0), nsmall = 0), ";", 
-    format(round(ocupadas_lsir, 0), nsmall = 0), ";", 
-    format(round(forca_lsir, 0), nsmall = 0), ";", 
-    format(round(taxa_lsir, 2), nsmall = 0), ";", 
-    format(round(nivel_lsir, 2), nsmall = 2), ";", 
-    format(round(participacao_lsir, 2), nsmall = 2)))
+    format(round(total, 0), nsmall = 0), ";", 
+    format(round(ocupadas, 0), nsmall = 0), ";", 
+    format(round(forca, 0), nsmall = 0), ";", 
+    format(round(taxa, 2), nsmall = 2), ";", 
+    format(round(nivel, 2), nsmall = 2), ";", 
+    format(round(participacao, 2), nsmall = 2)))
 }
 
 rendas <- function(pnadc)
 {
   
-  total_lsir <- nrow(subset(pnadc))
+  total <- nrow(subset(pnadc))
   renda_media_hab_principal <- weighted.mean(pnadc$rendahabprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
   renda_media_efe_principal <- weighted.mean(pnadc$rendaefeprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
   renda_media_hab_total <- weighted.mean(pnadc$rendahabtotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
@@ -45,6 +51,94 @@ rendas <- function(pnadc)
                 format(round(horas_hab_total, 2), nsmall = 2), ";", 
                 format(round(horas_efe_total, 2), nsmall = 2), ";",
                 format(round(escolaridade, 2), nsmall = 2)))
+  
+}
+
+
+todos_fora_forca <- function(pnads)
+{
+  todos_locais = c("", "Ceará")
+  todos_sexos = c("", "Homem", "Mulher")
+  todas_idades = c("", "Jovem", "Junior", "Pleno", "Senior", "Idoso")
+  todas_racas = c("", "Amarela", "Branca", "Indígena", "Parda", "Preta", "Negra", "Não Negra")
+  #V4074A
+  todas_respostas = c("",
+                      "Conseguiu proposta de trabalho para começar após a semana de referência ",
+                      "Estava aguardando resposta de medida tomada para conseguir trabalho ",
+                      "Não conseguia trabalho adequado",
+                      "Não tinha experiência profissional ou qualificação",
+                      "Não conseguia trabalho por ser considerado muito jovem ou muito idoso",
+                      "Não havia trabalho na localidade",
+                      "Tinha que cuidar dos afazeres domésticos, do(s) filho(s) ou de outro(s) parente(s) ",
+                      "Estava estudando (curso de qualquer tipo ou por conta própria)",
+                      "Por problema de saúde ou gravidez ",
+                      "Não aplicável"
+                      )
+  cat(paste("Fonte;", "Local;", "Sexo;", "Faixa etária;", "Raça;", 
+               #"Contribuição previdenciária?;", "Principal atividade;", "Grupamento;", 
+               #"Pessoas em idade ativa;", "Pessoas ocupadas;", "Força de trabalho;", 
+               #"Taxa de desocupação;", "Nível da ocupação;", "Participação;", 
+               #"Renda habitual;", "Horas trabalhadas",
+            "Resposta;", "Quantidade fora da força", "\n"),
+        file = "resultados_fora_forca.csv",
+        append = FALSE)
+  
+  
+  
+  for (pnadf in pnads)
+  {
+    pnadc <- preprocessamento(pnadf)
+    
+    # Idade mínima
+    pnsub <- subset(pnadc, pnadc$idade >= 14)
+    
+    for (local_ in todos_locais)
+    {
+      # Local (estado ou Brasil)
+      pnsubl <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) ) )
+      
+      for (sexo_ in todos_sexos)
+      {
+        # Sexo (homem ou mulher)
+        pnsubs <- subset(pnsubl,  ( (sexo_ == "") | (sexo == sexo_ ) ) ) 
+        for (faixa_etaria_ in todas_idades)
+        {
+          # Faixa etária
+          pnsubf <- subset(pnsubs,  ( (faixa_etaria_ == "") | (faixa_etaria == faixa_etaria_ ) ) ) 
+          
+          for (raca_ in todas_racas)
+          {
+            if (raca_ == "Negra")
+            {
+              pnsubr <- subset(pnsubf,  ( (raca == "Preta") | (raca == "Parda" ) ) )
+            }
+            else if (raca_ == "Não Negra")
+            {
+              pnsubr <- subset(pnsubf,  ( (raca != "Preta") & (raca != "Parda" ) ) )
+            }
+            else
+            {
+              pnsubr <- subset(pnsubf,  ( (raca_ == "") | (raca == raca_ ) ) )
+            }
+            
+            for (resposta_ in todas_respostas)
+            {
+              
+              pnsubresp <- subset(pnsubr, ( (resposta_ == "") | (pnsubr$resposta == resposta_ ) ) )
+              if (local_ == "") local_ <- "Brasil"
+              cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
+                          resposta_, ";", quant_fora_forca(pnsubresp), 
+                          "\n" ),
+                   file = "resultados_fora_forca.csv",
+                   append = TRUE)
+        
+            }
+          }
+        }
+      }
+    }
+  }
+              
   
 }
 
@@ -106,7 +200,6 @@ todas_as_atividades <- function(pnads)
                        "V: Atividades maldefinidas"
                        )
   
-  #todas_atividades = c("")
   todas_posicoes = c("")
   cat ( paste ("Fonte;", "Local;", "Sexo;", "Faixa etária;", "Raça;", 
                "Contribuição previdenciária?;", "Principal atividade;", "Grupamento;", 
