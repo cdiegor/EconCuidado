@@ -75,10 +75,6 @@ todos_fora_forca <- function(pnads)
                       "Não aplicável"
                       )
   cat(paste("Fonte;", "Local;", "Sexo;", "Faixa etária;", "Raça;", 
-               #"Contribuição previdenciária?;", "Principal atividade;", "Grupamento;", 
-               #"Pessoas em idade ativa;", "Pessoas ocupadas;", "Força de trabalho;", 
-               #"Taxa de desocupação;", "Nível da ocupação;", "Participação;", 
-               #"Renda habitual;", "Horas trabalhadas",
             "Resposta;", "Quantidade fora da força", "\n"),
         file = "resultados_fora_forca.csv",
         append = FALSE)
