@@ -8,7 +8,7 @@ leitura <- function(pnadtxt)
   # Leitura e salvamento dos dados
   pnadc <- read_pnadc(pnadtxt, "input_PNADC_trimestral.txt")
   pnadc <- pnadc_labeller(data_pnadc=pnadc, "dicionario_PNADC_microdados_trimestral.xls")
-  pnadc <- pnadc_deflator(pnadc, "deflator_PNADC_2023_trimestral_101112.xls")
+  pnadc <- pnadc_deflator(pnadc, "deflator_PNADC_2024_trimestral_010203.xls")
   
   pnadfile = substring(pnadtxt, 1, nchar(pnadtxt)-4)
   
@@ -28,14 +28,29 @@ preprocessamento <- function(pnadfile)
   #Pesos calibrados
   pnadc$pesoscalibrados = pnadc$V1028
   
+  # Subocupacao
+  pnadc$subocupacao = pnadc$V4063A
+  
+  # Domicilios, pessoas por domicilio, renda domiciliar e renda per capita
+  pnadc$Individuos_dom = pnadc$V2001
+  
+  pnadc = pnadc |> 
+    unite("Domicilio", c(UPA, Estrato, V1008), na.rm = TRUE, remove = FALSE) |>
+    group_by(Domicilio) |> 
+    mutate(Renda_dom = sum(VD4020 * Efetivo, na.rm = TRUE)) |> 
+    mutate(Renda_per_capita = round(Renda_dom * Efetivo/Individuos_dom, 2)) |> 
+    ungroup(Domicilio)
+
+  
+  #pnadc$Domicilio = pnadc$ID_DOMICILIO
+  
   # Idade
   pnadc$idade = pnadc$V2009
   
   pnadc <- subset(pnadc, idade >= 14)
   
   # Utilizando o design da PNAD estabelecido pelo IBGE
-  spnadc <- pnadc_design(data_pnadc = pnadc)
-  
+  #spnadc <- pnadc_design(data_pnadc = pnadc)
   
   # Sexo
   pnadc$sexo = pnadc$V2007
@@ -72,7 +87,6 @@ preprocessamento <- function(pnadfile)
   pnadc$UFN[pnadc$UF==52] <- 'Goiás'
   pnadc$UFN[pnadc$UF==53] <- 'Distrito Federal'
   
-  
   # Raça
   pnadc$raca = pnadc$V2010
   
@@ -91,7 +105,6 @@ preprocessamento <- function(pnadfile)
   pnadc$faixa_etaria[pnadc$idade>=50 & pnadc$idade<=64] = "Senior"
   pnadc$faixa_etaria[pnadc$idade>=65] = "Idoso"
   
-  
   # Renda média habitual de todos os trabalhos (VD4019)
   pnadc$rendahabtotal = pnadc$VD4019 * pnadc$Habitual 
   pnadc$rendaefetotal = pnadc$VD4020 * pnadc$Efetivo
@@ -102,7 +115,6 @@ preprocessamento <- function(pnadfile)
   
   # Renda média habitual do trabalho principal (VD4016)
   #pnadc$rendatrabtotal = pnadc$VD4016 * pnadc$Habitual 
-  
   
   # Pessoas na força de trabalho
   pnadc$forca = pnadc$VD4001
@@ -183,7 +195,11 @@ preprocessamento <- function(pnadfile)
   pnadc$grupamento[as.numeric(pnadc$V4013) >= 99000 & as.numeric(pnadc$V4013) <= 99000] <- "U: Organismos internacionais e outras instituições extraterritoriais"
   pnadc$grupamento[as.numeric(pnadc$V4013) == 00000] <- "V: Atividades maldefinidas"
   
+  # Providência tomada para conseguir trabalho
+  pnadc$providencia = pnadc$V4072A
   
+  # Motivo de não ter tomado a providência
+  pnadc$motivo = pnadc$V4074A
   
   # Grandes regiões
   pnadc$regioes = factor(
@@ -195,7 +211,6 @@ preprocessamento <- function(pnadfile)
   pnadc$escolaridade = as.numeric(gsub("([0-9]+).*$", "\\1", pnadc$VD3005))
   #pnadc %>% mutate(escolaridade=parse_number(escolaridade))
   
-  pnadc$resposta <- pnadc$V4074A
   
   final <- ncol(pnadc)
   
@@ -203,6 +218,6 @@ preprocessamento <- function(pnadfile)
   
   pnadc = pnadc[,(ncol(pnadc)-n-1):ncol(pnadc)]
   
-  return (pnadc)
+  return(pnadc)
   
 }

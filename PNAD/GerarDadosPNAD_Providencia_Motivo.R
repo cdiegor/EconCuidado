@@ -30,26 +30,33 @@ rendas <- function(pnadc)
 {
   
   total <- nrow(subset(pnadc))
-  renda_media_hab_principal <- weighted.mean(pnadc$rendahabprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
-  renda_media_efe_principal <- weighted.mean(pnadc$rendaefeprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
-  renda_media_hab_total <- weighted.mean(pnadc$rendahabtotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+#  renda_media_hab_principal <- weighted.mean(pnadc$rendahabprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+#  renda_media_efe_principal <- weighted.mean(pnadc$rendaefeprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+#  renda_media_hab_total <- weighted.mean(pnadc$rendahabtotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
   renda_media_efe_total <- weighted.mean(pnadc$rendaefetotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
   
-  horas_hab_principal <- weighted.mean(pnadc$horashabprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
-  horas_efe_principal <- weighted.mean(pnadc$horashabprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
-  horas_hab_total <- weighted.mean(pnadc$horashabtotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+#  horas_hab_principal <- weighted.mean(pnadc$horashabprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+#  horas_efe_principal <- weighted.mean(pnadc$horashabprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+#  horas_hab_total <- weighted.mean(pnadc$horashabtotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
   horas_efe_total <- weighted.mean(pnadc$horashabtotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
+
+  renda_domiciliar <- weighted.mean(pnadc$Renda_dom, w = pnadc$pesoscalibrados, na.rm = TRUE)
+  renda_domiciliar_pc <- weighted.mean(pnadc$Renda_per_capita, w = pnadc$pesoscalibrados, na.rm = TRUE)
   
+    
   escolaridade <- weighted.mean(pnadc$escolaridade, w = pnadc$pesoscalibrados, na.rm = TRUE)
   
-  return (paste(format(round(renda_media_hab_principal, 2), nsmall = 2), ";", 
-                format(round(renda_media_efe_principal, 2), nsmall = 2), ";",
-                format(round(renda_media_hab_total, 2), nsmall = 2), ";",
+  return (paste(
+#                format(round(renda_media_hab_principal, 2), nsmall = 2), ";", 
+#                format(round(renda_media_efe_principal, 2), nsmall = 2), ";",
+#                format(round(renda_media_hab_total, 2), nsmall = 2), ";",
                 format(round(renda_media_efe_total, 2), nsmall = 2), ";",
-                format(round(horas_hab_principal, 2), nsmall = 2), ";", 
-                format(round(horas_efe_principal, 2), nsmall = 2), ";",
-                format(round(horas_hab_total, 2), nsmall = 2), ";", 
+#                format(round(horas_hab_principal, 2), nsmall = 2), ";", 
+#                format(round(horas_efe_principal, 2), nsmall = 2), ";",
+#                format(round(horas_hab_total, 2), nsmall = 2), ";", 
                 format(round(horas_efe_total, 2), nsmall = 2), ";",
+                format(round(renda_domiciliar, 2), nsmall = 2), ";",
+                format(round(renda_domiciliar_pc, 2), nsmall = 2), ";",
                 format(round(escolaridade, 2), nsmall = 2)))
   
 }
@@ -404,6 +411,7 @@ todas_as_funcoes <- function(pnads)
 
 todas_as_posicoes <- function(pnads)
 {
+  respostas_ocupacao = c("", "Sim", "Não")
   
   todos_locais = c("", "Ceará")
   todos_sexos = c("", "Homem", "Mulher")
@@ -477,8 +485,13 @@ todas_as_posicoes <- function(pnads)
               
               for (posicao_ in todas_posicoes)
               {
-                #Setor econômico da atividade
+                # Setor econômico da atividade
                 pnsubp <- subset(pnsubc,  ( (posicao_ == "") | (posicao == posicao_ ) ) )  
+              }
+              for (resposta_ in respostas_ocupacao)
+              {
+                # Resposta de subocupacao
+                pnsubv <- subset(pnsubp, ( (resposta_ = "") | (resposta == resposta_) ) )
                 
                 if (local_ == "") local_ <- "Brasil"
                 cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
@@ -488,7 +501,6 @@ todas_as_posicoes <- function(pnads)
                             "\n" ),
                      file = "resultados_posicoes.csv",
                      append = TRUE)
-                
               }
               #}      
             }
@@ -499,6 +511,180 @@ todas_as_posicoes <- function(pnads)
   }
 }
 
+gerar_subocupados <- function(pnads)
+{
+  respostas_ocupacao = c("", "Sim", "Não")
+  todos_locais = c("", "Ceará")
+  todos_sexos = c("", "Homem", "Mulher")
+  todas_idades = c("", "Jovem", "Junior", "Pleno", "Senior", "Idoso")
+  todas_racas = c("", "Amarela", "Branca", "Indígena", "Parda", "Preta", "Negra", "Não Negra")
 
+  
+  cat ( paste ("Fonte;", "Local;", "Sexo;", "Faixa etária;", "Raça;", 
+               "Gostaria de trabalhar mais?;",  
+               "Pessoas em idade ativa;", "Pessoas ocupadas;", "Força de trabalho;", 
+               "Taxa de desocupação;", "Nível da ocupação;", "Participação;", 
+               "Renda efetiva total;", "Horas efetivas totais;", 
+               "Renda domiciliar;", "Renda domiciliar per capita;",
+               "Escolaridade",
+                 "\n"),
+        file = "resultados_subocupados.csv",
+        append = FALSE )
+  
+  
+  
+  for (pnadf in pnads)
+  {
+    pnadc <- preprocessamento(pnadf)
+    
+    # Idade mínima
+    pnsub <- subset(pnadc,  pnadc$idade >=14)
+    
+    for (local_ in todos_locais)
+    {
+      # Local (estado ou Brasil)
+      pnsubl <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) ) )
+      
+      for (sexo_ in todos_sexos)
+      {
+        # Sexo (homem ou mulher)
+        pnsubs <- subset(pnsubl,  ( (sexo_ == "") | (sexo == sexo_ ) ) ) 
+        for (faixa_etaria_ in todas_idades)
+        {
+          # Faixa etária
+          pnsubf <- subset(pnsubs,  ( (faixa_etaria_ == "") | (faixa_etaria == faixa_etaria_ ) ) ) 
+          
+          for (raca_ in todas_racas)
+          {
+            if (raca_ == "Negra")
+            {
+              pnsubr <- subset(pnsubf,  ( (raca == "Preta") | (raca == "Parda" ) ) )
+            }
+            else if (raca_ == "Não Negra")
+            {
+              pnsubr <- subset(pnsubf,  ( (raca != "Preta") & (raca != "Parda" ) ) )
+            }
+            else
+            {
+              pnsubr <- subset(pnsubf,  ( (raca_ == "") | (raca == raca_ ) ) )
+            }
+            
+            for (resposta_ in respostas_ocupacao)
+            {
+              # Resposta de subocupacao
+              pnsubv <- subset(pnsubr, ( (resposta_ == "") | (subocupacao == resposta_) ) )
+              
+              if (local_ == "") local_ <- "Brasil"
+              cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
+                          resposta_, ";",
+                          taxas(pnsubv),";", 
+                          rendas(pnsubv),";",
+                          "\n" ),
+                   file = "resultados_subocupados.csv",
+                   append = TRUE)
+            }
+          }
+        }
+      }
+    }  
+  }
+}
 
+todas_providencia_motivo <- function(pnads)
+{
+  
+  todos_locais = c("", "Ceará")
+  todos_sexos = c("", "Homem", "Mulher")
+  todas_idades = c("", "Jovem", "Junior", "Pleno", "Senior", "Idoso")
+  todas_racas = c("", "Amarela", "Branca", "Indígena", "Parda", "Preta", "Negra", "Não Negra")
+  providencia_tomada = c("",
+                         "Entrou em contato com empregador (pessoalmente, por telefone, por email ou pelo portal da empresa, inclusive enviando currículo)",
+                         "Colocou ou respondeu anúncio de trabalho em jornal ou revista",
+                         "Consultou ou inscreveu-se em agência de emprego privada ou sindicato",
+                         "Consultou ou inscreveu-se em agência de emprego municipal, estadual ou no Sistema Nacional de Emprego (SINE) ",
+                         "Fez ou inscreveu-se em concurso ",
+                         "Consultou parente, amigo ou colega",
+                         "Tomou medida para iniciar o próprio negócio (recursos financeiros, local para instalação, equipamentos, legalização etc.) ",
+                         "Tomou outra providência, especifique: ",
+                         "Não tomou providência efetiva",
+                         "Não aplicável")
+  providencia_motivo = c("",
+                         "Conseguiu proposta de trabalho para começar após a semana de referência ",
+                         "Estava aguardando resposta de medida tomada para conseguir trabalho ",
+                         "Não conseguia trabalho adequado",
+                         "Não tinha experiência profissional ou qualificação",
+                         "Não conseguia trabalho por ser considerado muito jovem ou muito idoso",
+                         "Não havia trabalho na localidade",
+                         "Tinha que cuidar dos afazeres domésticos, do(s) filho(s) ou de outro(s) parente(s) ",
+                         "Estava estudando (curso de qualquer tipo ou por conta própria)",
+                         "Por problema de saúde ou gravidez ",
+                         "Outro motivo, especifique",
+                         "Não aplicável")
+  
+  cat(paste("Fonte;", "Local;", "Sexo;",
+            "Faixa etária;", "Raça;", "Providência tomada;", "Motivo para não ter tomado a providência;",
+            "Pessoas em idade ativa;", "Pessoas ocupadas;", "Força de trabalho;", 
+            "Taxa de desemprego;", "Nível da ocupação;", "Participação;", 
+            "Renda média efetiva total;", "Horas efetivas totais;", 
+            "Renda domiciliar;", "Renda domiciliar per capita;", "Escolaridade;",  "\n"),
+      file = "resultados_providencia_motivo.csv",
+      append = FALSE)
+  
+  for (pnadf in pnads)
+  {
+    pnadc <- preprocessamento(pnadf)
+    
+    pnsub <- subset(pnadc, pnadc$idade >= 14)
+    
+    for (local_ in todos_locais)
+    {
+      pnsubl <- subset(pnsub, ((local_ == "") | (pnsub$UFN == local_) ) )
+      
+      for (sexo_ in todos_sexos)
+      {
+        pnsubs <- subset(pnsubl,  ( (sexo_ == "") | (sexo == sexo_ ) ) )
+        
+        for (faixa_etaria_ in todas_idades)
+        {
+          pnsubf <- subset(pnsubs,  ( (faixa_etaria_ == "") | (faixa_etaria == faixa_etaria_ ) ) )
+          
+          for (raca_ in todas_racas)
+          {
+            if (raca_ == "Negra")
+            {
+              pnsubr <- subset(pnsubf,  ( (raca == "Preta") | (raca == "Parda" ) ) )
+            }
+            else if (raca_ == "Não Negra")
+            {
+              pnsubr <- subset(pnsubf,  ( (raca != "Preta") & (raca != "Parda" ) ) )
+            }
+            else
+            {
+              pnsubr <- subset(pnsubf,  ( (raca_ == "") | (raca == raca_ ) ) )
+            }
+            
+            for (providencia_ in providencia_tomada)
+            {
+              pnsubprov <- subset(pnsubr, ( (providencia_ == "") | (pnsubr$providencia == providencia_) ))
+              
+              for (motivo_ in providencia_motivo)
+              {
+                pnsubmot <- subset(pnsubprov, ( (motivo_ == "") | (pnsubprov$motivo == motivo_) ))
+                
+                if (local_ == "") local_ <- "Brasil"
+                cat(paste(pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";",
+                          providencia_, ";", motivo_, ";", taxas(pnsubprov), ";", rendas(pnsubprov), ";",
+                          "\n"),
+                    file = "resultados_providencia_motivo.csv",
+                    append = TRUE)
+                
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
+todas_providencia_motivo(pnads)
