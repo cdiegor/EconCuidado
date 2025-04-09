@@ -1,4 +1,5 @@
 
+options(OutDec= ",")
 
 
 taxas <- function(pnadc)
@@ -28,7 +29,7 @@ rendas <- function(pnadc)
   renda_media_efe_principal <- weighted.mean(pnadc$rendaefeprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
   renda_media_hab_total <- weighted.mean(pnadc$rendahabtotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
   renda_media_efe_total <- weighted.mean(pnadc$rendaefetotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
-  
+   
   horas_hab_principal <- weighted.mean(pnadc$horashabprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
   horas_efe_principal <- weighted.mean(pnadc$horashabprincipal, w = pnadc$pesoscalibrados, na.rm = TRUE)
   horas_hab_total <- weighted.mean(pnadc$horashabtotal, w = pnadc$pesoscalibrados, na.rm = TRUE)
@@ -36,7 +37,8 @@ rendas <- function(pnadc)
   
   escolaridade <- weighted.mean(pnadc$escolaridade, w = pnadc$pesoscalibrados, na.rm = TRUE)
   
-  return (paste(format(round(renda_media_hab_principal, 2), nsmall = 2), ";", 
+  return (paste(
+                format(round(renda_media_hab_principal, 2), nsmall = 2), ";", 
                 format(round(renda_media_efe_principal, 2), nsmall = 2), ";",
                 format(round(renda_media_hab_total, 2), nsmall = 2), ";",
                 format(round(renda_media_efe_total, 2), nsmall = 2), ";",
@@ -46,6 +48,76 @@ rendas <- function(pnadc)
                 format(round(horas_efe_total, 2), nsmall = 2), ";",
                 format(round(escolaridade, 2), nsmall = 2)))
   
+}
+
+
+todas_categorias <- function(pnads)
+{
+  todos_locais = c("", "Ceará")
+  todos_sexos = c("", "Homem", "Mulher")
+  todas_idades = c("", "Jovem", "Junior", "Pleno", "Senior", "Idoso", "15a29")
+  todas_racas = c("", "Amarela", "Branca", "Indígena", "Parda", "Preta", "Negra", "Não Negra")
+  cat ( paste ("Fonte;", "Local;", "Sexo;", "Faixa etária;", "Raça;", 
+               "Pessoas em idade ativa;", "Pessoas ocupadas;", "Força de trabalho;", 
+               "Taxa de desocupação;", "Nível da ocupação;", "Participação;", 
+               "Renda habitual principal;", "Renda efetiva principal;",
+               "Renda habitual total;", "Renda efetiva total;", 
+               "Horas habituais principal;", "Horas efetivas principal;",
+               "Horas habituais total;",  "Horas efetivas total;", 
+               "Escolaridade",  "\n"),
+        file = "resultados_categorias.csv",
+        append = FALSE )
+  
+  
+  
+  for (pnadf in pnads)
+  {
+    pnadc <- preprocessamento(pnadf)
+    
+    # Idade mínima
+    pnsub <- subset(pnadc,  pnadc$idade >=14)
+    
+    for (local_ in todos_locais)
+    {
+      # Local (estado ou Brasil)
+      pnsubl <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) ) )
+      
+      for (sexo_ in todos_sexos)
+      {
+        # Sexo (homem ou mulher)
+        pnsubs <- subset(pnsubl,  ( (sexo_ == "") | (sexo == sexo_ ) ) ) 
+        for (faixa_etaria_ in todas_idades)
+        {
+          # Faixa etária
+          pnsubf <- subset(pnsubs,  ( (faixa_etaria_ == "") | (faixa_etaria == faixa_etaria_ ) ) ) 
+          
+          for (raca_ in todas_racas)
+          {
+            if (raca_ == "Negra")
+            {
+              pnsubr <- subset(pnsubf,  ( (raca == "Preta") | (raca == "Parda" ) ) )
+            }
+            else if (raca_ == "Não Negra")
+            {
+              pnsubr <- subset(pnsubf,  ( (raca != "Preta") & (raca != "Parda" ) ) )
+            }
+            else
+            {
+              pnsubr <- subset(pnsubf,  ( (raca_ == "") | (raca == raca_ ) ) )
+            }
+            
+            if (local_ == "") local_ <- "Brasil"
+            cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
+                        taxas(pnsubr),";", 
+                        rendas(pnsubr),";",
+                        "\n" ),
+                 file = "resultados_categorias.csv",
+                 append = TRUE)
+          }
+        }
+      }
+    }  
+  }
 }
 
 
@@ -112,7 +184,7 @@ todas_as_atividades <- function(pnads)
                "Contribuição previdenciária?;", "Principal atividade;", "Grupamento;", 
                "Pessoas em idade ativa;", "Pessoas ocupadas;", "Força de trabalho;", 
                "Taxa de desocupação;", "Nível da ocupação;", "Participação;", 
-               "Renda habitual;", "Escolaridade;", "Horas trabalhadas",  "\n"),
+               "Renda efetiva total;", "Horas trabalhadas efet total;", "Escolaridade",  "\n"),
         file = "resultados_atividades.csv",
         append = FALSE )
 
@@ -216,7 +288,7 @@ todas_as_funcoes <- function(pnads)
 {
   todos_locais = c("", "Ceará")
   todos_sexos = c("", "Homem", "Mulher")
-  todas_idades = c("", "Jovem", "Junior", "Pleno", "Senior", "Idoso")
+  todas_idades = c("", "Jovem", "Junior", "Pleno", "Senior", "Idoso", "15a29")
   todas_racas = c("", "Amarela", "Branca", "Indígena", "Parda", "Preta", "Negra", "Não Negra")
 
   
@@ -246,7 +318,7 @@ todas_as_funcoes <- function(pnads)
                 "Função;", "Especificação;",
                "Pessoas em idade ativa;", "Pessoas ocupadas;", "Força de trabalho;", 
                "Taxa de desocupação;", "Nível da ocupação;", "Participação;", 
-               "Renda habitual;", "Escolaridade;", "Horas trabalhadas",  "\n"),
+               "Renda efetiva total;", "Horas trabalhadas efet total;", "Escolaridade",  "\n"),
         file = "resultados_funcoes.csv",
         append = FALSE )
   
@@ -262,48 +334,105 @@ todas_as_funcoes <- function(pnads)
     for (local_ in todos_locais)
     {
       # Local (estado ou Brasil)
-      pnsubl <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) ) )
+      pnsublocal <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) ) )
       
       for (sexo_ in todos_sexos)
       {
         # Sexo (homem ou mulher)
-        pnsubs <- subset(pnsubl,  ( (sexo_ == "") | (sexo == sexo_ ) ) ) 
+        pnsubsexo <- subset(pnsublocal,  ( (sexo_ == "") | (sexo == sexo_ ) ) ) 
         for (faixa_etaria_ in todas_idades)
         {
           # Faixa etária
-          pnsubf <- subset(pnsubs,  ( (faixa_etaria_ == "") | (faixa_etaria == faixa_etaria_ ) ) ) 
+          pnsubfaixa <- subset(pnsubsexo,  ( (faixa_etaria_ == "") | (faixa_etaria == faixa_etaria_ ) ) ) 
           
           for (raca_ in todas_racas)
           {
             if (raca_ == "Negra")
             {
-              pnsubr <- subset(pnsubf,  ( (raca == "Preta") | (raca == "Parda" ) ) )
+              pnsubraca <- subset(pnsubfaixa,  ( (raca == "Preta") | (raca == "Parda" ) ) )
             }
             else if (raca_ == "Não Negra")
             {
-              pnsubr <- subset(pnsubf,  ( (raca != "Preta") & (raca != "Parda" ) ) )
+              pnsubraca <- subset(pnsubfaixa,  ( (raca != "Preta") & (raca != "Parda" ) ) )
             }
             else
             {
-              pnsubr <- subset(pnsubf,  ( (raca_ == "") | (raca == raca_ ) ) )
+              pnsubraca <- subset(pnsubfaixa,  ( (raca_ == "") | (raca == raca_ ) ) )
             }
             
             for (funcao_ in todas_funcoes)
             {
               # Posição da ocupação
-              pnsubf <- subset(pnsubr,  ( (funcao_ == "") | (funcao == funcao_ ) ) )
+              pnsubfuncao <- subset(pnsubraca,  ( (funcao_ == "") | (funcao == funcao_ ) ) )
               
-              for (especificacao_ in todas_especificacoes)
+              if (funcao_ == "Empregador" | funcao_ == "Conta própria")
               {
-                pnsube <- subset(pnsubf,  ( (especificacao_ == "") | (especificacao == especificacao_ ) ) )
-                cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
-                            funcao_, ";", especificacao_, ";", 
-                            taxas(pnsube),";", 
-                            rendas(pnsube),";",
-                            "\n" ),
-                     file = "resultados_funcoes.csv",
-                     append = TRUE)
+                especificacoes = c("", "Sim", "Não")
+                for (especificacao_ in especificacoes)
+                {
+                  pnsubespe <- subset(pnsubfuncao,  ( (especificacao_ == "") | (CNPJ == especificacao_ ) ) )
+                  if (especificacao_ == "Sim") especificacao_ <- "Com CNPJ"
+                  if (especificacao_ == "Não") especificacao_ <- "Sem CNPJ"
+                  if (local_ == "")
+                    local <- "Brasil"
+                  cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
+                              funcao_, ";", especificacao_, ";", 
+                              taxas(pnsubespe),";", 
+                              rendas(pnsubespe),";",
+                              "\n" ),
+                       file = "resultados_funcoes.csv",
+                       append = TRUE)
                   
+                }                
+              }
+              else
+              {
+                if (funcao_ == "Trabalhador doméstico")
+                {
+                  todas_especificacoes = c("",
+                                           "Trabalhador doméstico com carteira de trabalho assinada",
+                                           "Trabalhador doméstico sem carteira de trabalho assinada")                
+                }
+                if (funcao_ == "Militar do exército, da marinha, da aeronáutica, da polícia militar ou do corpo de bombeiros militar")
+                {
+                  todas_especificacoes = c("Militar e servidor estatutário")                
+                }
+                if (funcao_ == "Empregado do setor privado")
+                {
+                  todas_especificacoes = c("",
+                                           "Empregado no setor privado com carteira de trabalho assinada",
+                                           "Empregado no setor privado sem carteira de trabalho assinada")
+                }
+                if (funcao_ == "Empregado do setor público (inclusive empresas de economia mista)")
+                {
+                  todas_especificacoes = c("",
+                                           "Empregado no setor público com carteira de trabalho assinada",
+                                           "Empregado no setor público sem carteira de trabalho assinada",
+                                           "Militar e servidor estatutário")
+                }
+                if (funcao_ == "Trabalhador familiar não remunerado")
+                {
+                  todas_especificacoes = c("",
+                                           "Trabalhador familiar auxiliar")                
+                }
+                
+                for (especificacao_ in todas_especificacoes)
+                {
+                  pnsubespe <- subset(pnsubfuncao,  ( (especificacao_ == "") | (especificacao == especificacao_ ) ) )
+                  if (local_ == "") local_ <- "Brasil"
+                  if (funcao_ == "Empregado do setor público (inclusive empresas de economia mista)" &
+                      especificacao_ == "Militar e servidor estatutário") especificacao_ <- "Servidor estatutário"
+                  if (funcao_ == "Militar do exército, da marinha, da aeronáutica, da polícia militar ou do corpo de bombeiros militar")
+                      especificacao_ <- "Militar"
+                  cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
+                              funcao_, ";", especificacao_, ";", 
+                              taxas(pnsubespe),";", 
+                              rendas(pnsubespe),";",
+                              "\n" ),
+                       file = "resultados_funcoes.csv",
+                       append = TRUE)
+                  
+                }
               }
             }
           }
@@ -339,7 +468,7 @@ todas_as_posicoes <- function(pnads)
                "Contribuição previdenciária?;", "Posição;", 
                "Pessoas em idade ativa;", "Pessoas ocupadas;", "Força de trabalho;", 
                "Taxa de desocupação;", "Nível da ocupação;", "Participação;", 
-               "Renda habitual;", "Escolaridade;", "Horas trabalhadas",  "\n"),
+               "Renda habitual total;", "Horas trabalhadas hab total;", "Escolaridade",  "\n"),
         file = "resultados_posicoes.csv",
         append = FALSE )
   

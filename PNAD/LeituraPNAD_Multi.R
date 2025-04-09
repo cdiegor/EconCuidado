@@ -1,14 +1,11 @@
-library(PNADcIBGE)
-library(dplyr)
-library(survey)
-library(readr)
+library(lubridate)
 
 leitura <- function(pnadtxt)
 {
   # Leitura e salvamento dos dados
   pnadc <- read_pnadc(pnadtxt, "input_PNADC_trimestral.txt")
   pnadc <- pnadc_labeller(data_pnadc=pnadc, "dicionario_PNADC_microdados_trimestral.xls")
-  pnadc <- pnadc_deflator(pnadc, "deflator_PNADC_2024_trimestral_010203.xls")
+  pnadc <- pnadc_deflator(pnadc, "deflator_PNADC_2024_trimestral_101112.xls")
   
   pnadfile = substring(pnadtxt, 1, nchar(pnadtxt)-4)
   
@@ -21,9 +18,12 @@ leitura <- function(pnadtxt)
 preprocessamento <- function(pnadfile)
 {
   # Abrindo os dados
-  pnadc <- as_tibble(readRDS(file = pnadfile))
+  pnadc <- (readRDS(file = pnadfile))
   
   inicial <- ncol(pnadc)
+  
+  #Pesos não calibrados
+  #pnadc$amostra = pnadc$V1027
   
   #Pesos calibrados
   pnadc$pesoscalibrados = pnadc$V1028
@@ -34,7 +34,7 @@ preprocessamento <- function(pnadfile)
   pnadc <- subset(pnadc, idade >= 14)
   
   # Utilizando o design da PNAD estabelecido pelo IBGE
-  spnadc <- pnadc_design(data_pnadc = pnadc)
+  #spnadc <- pnadc_design(data_pnadc = pnadc)
   
   
   # Sexo
@@ -85,14 +85,25 @@ preprocessamento <- function(pnadfile)
   
   # Faixas etárias
   pnadc$faixa_etaria = pnadc$idade
-  pnadc$faixa_etaria[pnadc$idade>=14 & pnadc$idade<=24] = "Jovem"
-  pnadc$faixa_etaria[pnadc$idade>=25 & pnadc$idade<=29] = "Junior"
-  pnadc$faixa_etaria[pnadc$idade>=30 & pnadc$idade<=49] = "Pleno"
-  pnadc$faixa_etaria[pnadc$idade>=50 & pnadc$idade<=64] = "Senior"
-  pnadc$faixa_etaria[pnadc$idade>=65] = "Idoso"
-  pnadc$faixa_etaria[pnadc$idade>=15 & pnadc$idade<=29] = "15a29"
+  pnadc$faixa_etaria[pnadc$idade>=14 & pnadc$idade<=17] = "14 a 17"
+  pnadc$faixa_etaria[pnadc$idade>=18 & pnadc$idade<=24] = "18 a 24"
+  pnadc$faixa_etaria[pnadc$idade>=25 & pnadc$idade<=39] = "25 a 39"
+  pnadc$faixa_etaria[pnadc$idade>=40 & pnadc$idade<=59] = "40 a 59"
+  pnadc$faixa_etaria[pnadc$idade>=60] = "60 ou mais"
+  #pnadc$faixa_etaria[pnadc$idade>=15 & pnadc$idade<=29] = "15 a 29"
   
   
+  # Nivel de instrução
+  pnadc$nivel_instrucao = pnadc$VD3004
+  pnadc$nivel_instrucao[pnadc$nivel_instrucao == 1] = "Sem instrução e menos de 1 ano de estudo"
+  pnadc$nivel_instrucao[pnadc$nivel_instrucao == 2] = "Fundamental incompleto ou equivalente"
+  pnadc$nivel_instrucao[pnadc$nivel_instrucao == 3] = "Fundamental completo ou equivalente"
+  pnadc$nivel_instrucao[pnadc$nivel_instrucao == 4] = "Médio incompleto ou equivalente"
+  pnadc$nivel_instrucao[pnadc$nivel_instrucao == 5] = "Médio completo ou equivalente"
+  pnadc$nivel_instrucao[pnadc$nivel_instrucao == 6] = "Superior incompleto ou equivalente"
+  pnadc$nivel_instrucao[pnadc$nivel_instrucao == 7] = "Superior completo"
+
+
   # Renda média habitual de todos os trabalhos (VD4019)
   pnadc$rendahabtotal = pnadc$VD4019 * pnadc$Habitual 
   pnadc$rendaefetotal = pnadc$VD4020 * pnadc$Efetivo
@@ -104,7 +115,38 @@ preprocessamento <- function(pnadfile)
   # Renda média habitual do trabalho principal (VD4016)
   #pnadc$rendatrabtotal = pnadc$VD4016 * pnadc$Habitual 
   
+  pnadc$Individuos_dom = pnadc$V2001
   
+  # Renda domiciliar efetiva total
+  
+  pnadc = pnadc |> 
+    unite("Domicilio", c(UPA, Estrato, V1008), na.rm = TRUE, remove = FALSE) |>
+    group_by(Domicilio) |> 
+      mutate(Renda_dom = sum(VD4020 * Efetivo, na.rm = TRUE)) |> 
+      mutate(Renda_per_capita = round(Renda_dom * Efetivo/Individuos_dom, 2)) |> 
+    ungroup(Domicilio)
+
+  # Unite columns to create the "Domicilio" column
+  #pnadc$Domicilio <- apply(pnadc[, c("UPA", "Estrato", "V1008")], 1, function(x) paste(na.omit(x), collapse = "_"))
+  
+  #print("Domicilios criados")
+  
+  # Create an empty vector to store the sum of "Renda_dom"
+  #pnadc$Renda_dom <- numeric(nrow(pnadc))
+  
+  # Loop through each unique "Domicilio" and calculate the sum for "Renda_dom"
+  #unique_domicilios <- unique(pnadc$Domicilio)
+  #for (dom in unique_domicilios) {
+  #  soma = sum(pnadc$VD4020[pnadc$Domicilio == dom] %*% pnadc$Efetivo[pnadc$Domicilio == dom], na.rm = TRUE)
+  #  pnadc$Renda_dom[pnadc$Domicilio == dom] <- soma
+  #}
+  
+  # Calculate "Renda_per_capita" and add it to the data frame
+  #pnadc$Renda_per_capita <- round(pnadc$Renda_dom / pnadc$Individuos_dom, 2)
+  
+  print("Rendas domiciliares calculadas")
+  
+    
   # Pessoas na força de trabalho
   pnadc$forca = pnadc$VD4001
   
@@ -115,10 +157,10 @@ preprocessamento <- function(pnadfile)
   pnadc$contribuicao = pnadc$VD4012
   
   # Horas habitualmente trabalhadas
-  pnadc$horashabprincipal = pnadc$V4039
-  pnadc$horasefeprincipal = pnadc$V4039C
-  pnadc$horashabtotal = pnadc$VD4031
-  pnadc$horasefetotal = pnadc$VD4032
+  pnadc$horashabprincipal = as.numeric(pnadc$V4039)
+  pnadc$horasefeprincipal = as.numeric(pnadc$V4039C)
+  pnadc$horashabtotal = as.numeric(pnadc$VD4031)
+  pnadc$horasefetotal = as.numeric(pnadc$VD4035)
   
   # Posição na ocupação
   pnadc$posicao = pnadc$V4010
@@ -160,14 +202,14 @@ preprocessamento <- function(pnadfile)
   
   pnadc$grupamento = pnadc$atividade
    
-  # Divisão em grupamentostividade no trabalho principal - correspondência Isic 4 x CNAE20
+  # Divisão em grupamentos atividade no trabalho principal - correspondência Isic 4 x CNAE20
   pnadc$grupamento[as.numeric(pnadc$V4013) >=  1000 & as.numeric(pnadc$V4013) <=  3220] <- "A: Agricultura, pecuária, produção florestal, pesca e aquicultura"
   pnadc$grupamento[as.numeric(pnadc$V4013) >=  5000 & as.numeric(pnadc$V4013) <=  9900] <- "B: Indústrias extrativas"
   pnadc$grupamento[as.numeric(pnadc$V4013) >= 10000 & as.numeric(pnadc$V4013) <= 33200] <- "C: Indústrias de transformação"
   pnadc$grupamento[as.numeric(pnadc$V4013) >= 35000 & as.numeric(pnadc$V4013) <= 35300] <- "D: Eletricidade e gás"
   pnadc$grupamento[as.numeric(pnadc$V4013) >= 36000 & as.numeric(pnadc$V4013) <= 39000] <- "E: Água, esgoto, atividades de gestão de resíduos e descontaminação"
   pnadc$grupamento[as.numeric(pnadc$V4013) >= 41000 & as.numeric(pnadc$V4013) <= 43900] <- "F: Construção"
-  pnadc$grupamento[as.numeric(pnadc$V4013) >= 45000 & as.numeric(pnadc$V4013) <= 47990] <- "G: Comércio; reparação de veículos automotores e motocicletas"
+  pnadc$grupamento[as.numeric(pnadc$V4013) >= 45000 & as.numeric(pnadc$V4013) <= 48100] <- "G: Comércio, reparação de veículos automotores e motocicletas"
   pnadc$grupamento[as.numeric(pnadc$V4013) >= 49000 & as.numeric(pnadc$V4013) <= 53200] <- "H: Transporte, armazenagem e correio"
   pnadc$grupamento[as.numeric(pnadc$V4013) >= 55000 & as.numeric(pnadc$V4013) <= 56300] <- "I: Alojamento e alimentação"
   pnadc$grupamento[as.numeric(pnadc$V4013) >= 58000 & as.numeric(pnadc$V4013) <= 63990] <- "J: Informação e comunicação"
@@ -185,9 +227,31 @@ preprocessamento <- function(pnadfile)
   pnadc$grupamento[as.numeric(pnadc$V4013) == 00000] <- "V: Atividades maldefinidas"
   
   
+  # Código COD de ocupações
+  pnadc$COD = pnadc$V4010
   
+  # Estava trabalhando
+  pnadc$trabalhando = pnadc$V4001
+  
+  # Tomou providencia
+  pnadc$tomouprovidencia = pnadc$V4071
+
+  # Providência tomada para conseguir trabalho
+  pnadc$providencia = pnadc$V4072A
+  
+  # Motivo de não ter tomado a providência
+  pnadc$motivo = pnadc$V4074A
+  
+  # Quanto tempo estava sem trabalhar
+  pnadc$temposemtrabalhar = c(rep(0, length(pnadc$V4076)))
+  pnadc$temposemtrabalhar[pnadc$V4076 %in% "De 1 mês a menos de 1 ano"] = as.numeric(pnadc$V40761[pnadc$V4076 %in% "De 1 mês a menos de 1 ano"])
+  pnadc$temposemtrabalhar[pnadc$V4076 %in% "De 1 ano a menos de 2 anos"] = 12 + as.numeric(pnadc$V40762[pnadc$V4076 %in% "De 1 ano a menos de 2 anos"])
+  pnadc$temposemtrabalhar[pnadc$V4076 %in% "2 anos ou mais"] = 12 * as.numeric(pnadc$V40763[pnadc$V4076 %in% "2 anos ou mais"])
+  
+  
+
   # Grandes regiões
-  pnadc$regioes = factor(
+  pnadc$regiao = factor(
     substr(pnadc$UPA, 1, 1),
     labels = c("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste")
   )
@@ -204,4 +268,15 @@ preprocessamento <- function(pnadfile)
   
   return (pnadc)
   
+}
+
+
+
+rosto <- function(tipo_geracao, arquivo_saida)
+{
+  cat ( paste ("Folha de rosto para ", tipo_geracao, " \n"), file = arquivo_saida, append = FALSE )
+  cat ( paste ("Data: ", now() , " \n"), file = arquivo_saida, append = TRUE )
+  cat ( paste ("Variáveis: input_PNADC_trimestral.txt \n"), file = arquivo_saida, append = TRUE )
+  cat ( paste ("Dicionário: dicionario_PNADC_microdados_trimestral.xls \n"), file = arquivo_saida, append = TRUE )
+  cat ( paste ("Deflatores: deflator_PNADC_2024_trimestral_101112.xls \n"), file = arquivo_saida, append = TRUE )
 }

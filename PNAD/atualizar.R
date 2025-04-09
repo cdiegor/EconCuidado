@@ -1,0 +1,63 @@
+
+library(hash)
+
+library(PNADcIBGE)
+library(tidyr)
+library(dplyr, warn.conflicts = FALSE)
+library(survey)
+library(readr)
+
+library(doParallel)
+library(foreach)
+library(itertools)
+library(parallel)
+
+setwd("C:/Projetos/PNAD")
+source("GerarDadosPNAD_Multi.R")
+source("LeituraPNAD_Multi.R")
+options(OutDec= ",")
+
+# Fazer uma vez para gerar o arquivo compilado
+
+atualizar_RDS <- function()
+{
+  arquivo_pnad_2018T01 <- leitura("PNADC_012016.txt")
+  arquivo_pnad_2018T02 <- leitura("PNADC_022016.txt")
+  arquivo_pnad_2018T03 <- leitura("PNADC_032016.txt")
+  arquivo_pnad_2018T04 <- leitura("PNADC_042016.txt")
+  arquivo_pnad_2019T01 <- leitura("PNADC_012017.txt")
+  arquivo_pnad_2019T02 <- leitura("PNADC_022017.txt")
+  arquivo_pnad_2019T03 <- leitura("PNADC_032017.txt")
+  arquivo_pnad_2019T04 <- leitura("PNADC_042017.txt")
+  arquivo_pnad_2018T01 <- leitura("PNADC_012018.txt")
+  arquivo_pnad_2018T02 <- leitura("PNADC_022018.txt")
+  arquivo_pnad_2018T03 <- leitura("PNADC_032018.txt")
+  arquivo_pnad_2018T04 <- leitura("PNADC_042018.txt")
+  arquivo_pnad_2019T01 <- leitura("PNADC_012019.txt")
+  arquivo_pnad_2019T02 <- leitura("PNADC_022019.txt")
+  arquivo_pnad_2019T03 <- leitura("PNADC_032019.txt")
+  arquivo_pnad_2019T04 <- leitura("PNADC_042019.txt")
+  arquivo_pnad_2020T01 <- leitura("PNADC_012020.txt")
+  arquivo_pnad_2020T02 <- leitura("PNADC_022020.txt")
+  arquivo_pnad_2020T03 <- leitura("PNADC_032020.txt")
+  arquivo_pnad_2020T04 <- leitura("PNADC_042020.txt")
+  arquivo_pnad_2021T01 <- leitura("PNADC_012021.txt")
+  arquivo_pnad_2021T02 <- leitura("PNADC_022021.txt")
+  arquivo_pnad_2021T03 <- leitura("PNADC_032021.txt")
+  arquivo_pnad_2021T04 <- leitura("PNADC_042021.txt")
+  arquivo_pnad_2022T01 <- leitura("PNADC_012022.txt")
+  arquivo_pnad_2022T02 <- leitura("PNADC_022022.txt")
+  arquivo_pnad_2022T03 <- leitura("PNADC_032022.txt")
+  arquivo_pnad_2022T04 <- leitura("PNADC_042022.txt")
+  arquivo_pnad_2023T01 <- leitura("PNADC_012023.txt")
+  arquivo_pnad_2023T02 <- leitura("PNADC_022023.txt")
+  arquivo_pnad_2023T03 <- leitura("PNADC_032023.txt")
+  arquivo_pnad_2023T04 <- leitura("PNADC_042023.txt")
+  arquivo_pnad_2024T01 <- leitura("PNADC_012024.txt")
+  arquivo_pnad_2024T02 <- leitura("PNADC_022024.txt")
+  arquivo_pnad_2024T03 <- leitura("PNADC_032024.txt")
+  arquivo_pnad_2024T04 <- leitura("PNADC_042024.txt")
+  
+}
+
+atualizar_RDS()
