@@ -256,6 +256,13 @@ preprocessamento <- function(pnadfile)
     labels = c("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste")
   )
   
+  # Regiões metropolitanas
+  pnadc$regmetro = pnadc$RM_RIDE
+  
+  # Capitais
+  pnadc$municipio = pnadc$Capital
+  
+  
   # Escolaridade
   pnadc$escolaridade = as.numeric(gsub("([0-9]+).*$", "\\1", pnadc$VD3005))
   #pnadc %>% mutate(escolaridade=parse_number(escolaridade))

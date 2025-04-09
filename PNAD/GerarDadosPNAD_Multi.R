@@ -19,6 +19,20 @@ taxas <- function(pnadc)
     format(round(participacao_lsir, 2), nsmall = 2)))
 }
 
+numeros <- function(pnadc)
+{
+  
+  total_lsir        <- sum(pnadc$pesoscalibrados)
+  ocupadas_lsir     <- sum(subset(pnadc, (pnadc$ocupadas=="Pessoas ocupadas") & (pnadc$forca=="Pessoas na força de trabalho") )$pesoscalibrados )  
+  forca_lsir        <- sum(subset(pnadc,  (pnadc$forca=="Pessoas na força de trabalho") )$pesoscalibrados )
+
+  return (paste(nrow(pnadc), ";",
+                format(round(total_lsir, 0), nsmall = 0), ";", 
+                format(round(ocupadas_lsir, 0), nsmall = 0), ";", 
+                format(round(forca_lsir, 0), nsmall = 0)))
+}
+
+
 rendas <- function(pnadc)
 {
   
@@ -111,16 +125,9 @@ gerar_planilha_base <- function(pnads, arquivo_saida)
     
     for (local_ in todos_locais)
     {
-      # Local (estado ou Brasil)
-#      if (local_ == "Norte" | local_ == "Nordeste" | local_ == "Sul" | local_ == "Sudeste" | local_ == "Centro-Oeste")
-#      {
-#        pnsubl <- subset(pnsub, (pnsub$regiao == local_))
-#      }  
-#      else
-#      {
-        pnsubl <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) |  (pnsub$regiao == local_) | (pnsub$regmetro == local_) | (pnsub$municipio == local_) ) )
-#      }
-      
+      # Local
+      pnsubl <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) |  (pnsub$regiao == local_) | (pnsub$regmetro == local_) | (pnsub$municipio == local_) ) )
+
       if (local_ == "") local_ <- "Brasil"
       
       for (sexo_ in todos_sexos)
@@ -594,7 +601,7 @@ todas_as_posicoes <- function(pnads)
     for (local_ in todos_locais)
     {
       # Local (estado ou Brasil)
-      pnsubl <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) ) )
+      pnsubl <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) |  (pnsub$regiao == local_) | (pnsub$regmetro == local_) | (pnsub$municipio == local_) ) )
       
       for (sexo_ in todos_sexos)
       {
@@ -706,8 +713,9 @@ gerar_posicao_na_ocupacao <- function(pnads, arquivo_saida)
     for (local_ in todos_locais)
     {
       # Local (estado ou Brasil)
-      pnsublocal <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) ) )
-      if (local_ == "") local <- "Brasil"
+      
+      pnsublocal <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) |  (pnsub$regiao == local_) | (pnsub$regmetro == local_) | (pnsub$municipio == local_) ) )
+      if (local_ == "") local_ <- "Brasil"
       
       for (sexo_ in todos_sexos)
       {
@@ -1094,16 +1102,8 @@ gerar_trabalhadores_cuidadores <- function(pnads, arquivo_saida)
     for (local_ in todos_locais)
     {
       # Local (estado ou Brasil)
-      if (local_ == "Nordeste")
-      {
-        pnsublocal <- subset(pnsub, (pnsub$regiao == local_))
-      }
-      else
-      {
-        pnsublocal <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) ) )
-      }
-      
-      if (local_ == "") local <- "Brasil"
+      pnsublocal <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) |  (pnsub$regiao == local_) | (pnsub$regmetro == local_) | (pnsub$municipio == local_) ) )
+      if (local_ == "") local_ <- "Brasil"
       
       for (sexo_ in todos_sexos)
       {
@@ -1517,9 +1517,8 @@ providencia_tomada = c("",
     
     for (local_ in todos_locais)
     {
-      # Local (estado ou Brasil)
-
-      pnsublocal <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) ) )
+      # Local
+      pnsublocal <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) |  (pnsub$regiao == local_) | (pnsub$regmetro == local_) | (pnsub$municipio == local_) ) )
       if (local_ == "") local_ <- "Brasil"
       
       for (sexo_ in todos_sexos)
@@ -1616,16 +1615,8 @@ gerar_fora_da_forca <- function(pnads, arquivo_saida)
 
     for (local_ in todos_locais)
     {
-      # Local (estado ou Brasil)
-      if (local_ == "Nordeste")
-      {
-        pnsublocal <- subset(pnsub, (pnsub$regiao == local_))
-      }
-      else
-      {
-        pnsublocal <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) ) )
-      }
-      
+      # Local
+      pnsubl <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) |  (pnsub$regiao == local_) | (pnsub$regmetro == local_) | (pnsub$municipio == local_) ) )
       if (local_ == "") local_ <- "Brasil"
       
       for (sexo_ in todos_sexos)
@@ -1724,16 +1715,8 @@ gerar_subocupados <- function(pnads, arquivo_saida)
     
     for (local_ in todos_locais)
     {
-      # Local (estado ou Brasil)
-      if (local_ == "Nordeste")
-      {
-        pnsublocal <- subset(pnsub, (pnsub$regiao == local_))
-      }
-      else
-      {
-        pnsublocal <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) ) )
-      }
       
+      pnsublocal <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) |  (pnsub$regiao == local_) | (pnsub$regmetro == local_) | (pnsub$municipio == local_) ) )
       if (local_ == "") local_ <- "Brasil"
       
       for (sexo_ in todos_sexos)
@@ -1780,6 +1763,504 @@ gerar_subocupados <- function(pnads, arquivo_saida)
         }
       }
     }
+  }
+}
+
+
+gerar_pno_cnae <- function(pnads, arquivo_saida)
+{
+  options(OutDec = ',')
+  todos_locais = c("", "Ceará")
+  todos_sexos = c("", "Homem", "Mulher")
+  todas_idades = c("", "14 a 17", "18 a 24", "25 a 39", "40 a 59", "60 ou mais")
+  todas_racas = c("", "Amarela", "Branca", "Indígena", "Parda", "Preta", "Negra", "Não Negra")
+  todos_niveis = c("", "Sem instrução e menos de 1 ano de estudo", "Fundamental incompleto ou equivalente",
+                   "Fundamental completo ou equivalente", "Médio incompleto ou equivalente", "Médio completo ou equivalente",
+                   "Superior incompleto ou equivalente", "Superior completo")
+  
+  posicao_na_ocupacao = c("", "Empregado", "Empregador", "Conta própria", "Trabalhador doméstico","Trabalhador familiar auxiliar", "Formal", "Informal")
+  situacao_empregado = c("", "Setor privado com carteira", "Setor privado sem carteira",
+                         "Setor público com carteira", "Setor público sem carteira", "Militar e servidor estatutário")
+  situacao_domestico = c("", "Trabalhador doméstico com carteira", "Trabalhador doméstico sem carteira")
+  situacao_empregador = c("", "Com CNPJ", "Sem CNPJ")
+  situacao_contapropria = c("", "Com CNPJ", "Sem CNPJ")
+  
+  
+  cat ( paste ("Fonte;", "Local;", "Sexo;", "Faixa etária;", "Nível de instrução;", "Raça;", 
+               "Principal atividade;", "Grupamento;", "Posição;", "Situação;",
+               "Amostra;", "Pessoas em idade ativa;", "Pessoas ocupadas;", "Força de trabalho;", 
+               "Renda habitual principal;", "Renda efetiva principal;", "Renda habitual total;", "Renda efetiva total;", 
+               "Horas habituais principal;", "Horas efetivas principal;", "Horas habituais total;",  "Horas efetivas total;", 
+               "Renda Domiciliar efetiva total;", "Renda Domiciliar efetiva per capita;",    
+               "Escolaridade",  "\n"),
+        file = arquivo_saida,
+        append = FALSE )
+  
+  
+  
+  for (pnadf in pnads)
+  {
+    pnadc <- preprocessamento(pnadf)
+    
+    # Idade mínima
+    pnsub <- subset(pnadc,  pnadc$idade >=14)
+    
+    for (local_ in todos_locais)
+    {
+      # Local (estado ou Brasil)
+      
+      pnsublocal <- subset(pnsub,  ( (local_== "") | (pnsub$UFN == local_) |  (pnsub$regiao == local_) | (pnsub$regmetro == local_) | (pnsub$municipio == local_) ) )
+      if (local_ == "") local_ <- "Brasil"
+      
+      for (sexo_ in todos_sexos)
+      {
+        # Sexo (homem ou mulher)
+        pnsubsexo <- subset(pnsublocal,  ( (sexo_ == "") | (sexo == sexo_ ) ) ) 
+        for (faixa_etaria_ in todas_idades)
+        {
+          # Faixa etária
+          if (faixa_etaria_ == "15 a 29")
+          {
+            pnsubfaixa <- subset(pnsubsexo,  (idade >= 15 & idade <=29 ) )
+          }
+          else
+          {
+            pnsubfaixa <- subset(pnsubsexo,  ( (faixa_etaria_ == "") | (faixa_etaria == faixa_etaria_ ) ) ) 
+          }
+          
+            for (raca_ in todas_racas)
+            {
+              if (raca_ == "Negra")
+              {
+                pnsubraca <- subset(pnsubfaixa,  ( (raca == "Preta") | (raca == "Parda" ) ) )
+              }
+              else if (raca_ == "Não Negra")
+              {
+                pnsubraca <- subset(pnsubfaixa,  ( (raca != "Preta") & (raca != "Parda" ) ) )
+              }
+              else
+              {
+                pnsubraca <- subset(pnsubnivel,  ( (raca_ == "") | (raca == raca_ ) ) )
+              }
+
+              
+              for (atividade_ in c("",
+                                   "Indústria",
+                                   "Informação, comunicação e atividades financeiras, imobiliárias, profissionais e administrativas",
+                                   "Administração pública, defesa e seguridade social, educação, saúde humana e serviços sociais",
+                                   "Outros serviços"))
+              {
+                grupamento_ <- ""
+                pnsuba <- subset(pnsubraca,  ( (atividade_ == "") | (atividade == atividade_ ) ) )  
+                
+                for (posicao_ in posicao_na_ocupacao)
+                {
+                  
+                  if (posicao_ == "")
+                  {
+                    situacao_ <- ""
+                    pnsubsit <- pnsuba
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                atividade_,  ";", grupamento_,  ";", posicao_, ";", situacao_, ";", 
+                                numeros(pnsubsit),";", 
+                                rendas(pnsubsit),";",
+                                "\n" ),
+                         file = arquivo_saida,
+                         append = TRUE)
+                  }
+                  
+                  else if (posicao_ == "Empregado")
+                  {
+                    for (situacao_ in situacao_empregado)
+                    {
+                      
+                      if (situacao_ == "Setor privado com carteira")
+                      {
+                        pnsubsit <- subset((pnsuba), (especificacao == "Empregado no setor privado com carteira de trabalho assinada") )
+                      }
+                      else if (situacao_ == "Setor privado sem carteira")
+                      {
+                        pnsubsit <- subset((pnsuba), (especificacao == "Empregado no setor privado sem carteira de trabalho assinada") )
+                      }
+                      else if (situacao_ == "Setor público com carteira")
+                      {
+                        pnsubsit <- subset((pnsuba), (especificacao == "Empregado no setor público com carteira de trabalho assinada") )
+                      }
+                      else if (situacao_ == "Setor público sem carteira")
+                      {
+                        pnsubsit <- subset((pnsuba), (especificacao == "Empregado no setor público sem carteira de trabalho assinada") )
+                      }
+                      else if (situacao_ == "Militar e servidor estatutário")
+                      {
+                        pnsubsit <- subset((pnsuba), (especificacao == "Militar e servidor estatutário") )
+                      }
+                      else
+                      {
+                        pnsubsit <- subset((pnsuba), (funcao == "Trabalhador doméstico") |
+                                             (funcao == "Militar do exército, da marinha, da aeronáutica, da polícia militar ou do corpo de bombeiros militar") |
+                                             (funcao == "Empregado do setor privado") |
+                                             (funcao == "Empregado do setor público (inclusive empresas de economia mista)") )
+                      }
+                      
+                      
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                  atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                  numeros(pnsubsit),";", 
+                                  rendas(pnsubsit),";",
+                                  "\n" ),
+                           file = arquivo_saida,
+                           append = TRUE)
+                    }
+                  }
+                  else if (posicao_ == "Empregador")
+                  {
+                    for (situacao_ in situacao_empregador)
+                    {
+                      if (situacao_ == "Com CNPJ")
+                      {
+                        pnsubsit <- subset((pnsuba), (funcao == "Empregador") & (CNPJ == "Sim") )
+                      }
+                      else if (situacao_ == "Sem CNPJ")
+                      {
+                        pnsubsit <- subset((pnsuba), (funcao == "Empregador") & (CNPJ == "Não") )
+                      }
+                      else
+                      {
+                        pnsubsit <- subset((pnsuba), (funcao == "Empregador") )
+                      }
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                  atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                  taxas(pnsubsit),";", 
+                                  rendas(pnsubsit),";",
+                                  "\n" ),
+                           file = arquivo_saida,
+                           append = TRUE)
+                    }
+                  }
+                  else if (posicao_ == "Conta própria")
+                  {
+                    for (situacao_ in situacao_empregador)
+                    {
+                      if (situacao_ == "Com CNPJ")
+                      {
+                        pnsubsit <- subset((pnsuba), (funcao == "Conta própria") & (CNPJ == "Sim") )
+                      }
+                      else if (situacao_ == "Sem CNPJ")
+                      {
+                        pnsubsit <- subset((pnsuba), (funcao == "Conta própria") & (CNPJ == "Não") )
+                      }
+                      else
+                      {
+                        pnsubsit <- subset((pnsuba), (funcao == "Conta própria") )
+                      }
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                  atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                  numeros(pnsubsit),";", 
+                                  rendas(pnsubsit),";",
+                                  "\n" ),
+                           file = arquivo_saida,
+                           append = TRUE)
+                    }
+                  }
+                  else if (posicao_ == "Trabalhador doméstico")
+                  {
+                    for (situacao_ in situacao_domestico)
+                    {
+                      if (situacao_ == "Trabalhador doméstico com carteira")
+                      {
+                        pnsubsit <- subset((pnsuba), (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") )
+                      }
+                      else if (situacao_ == "Trabalhador doméstico sem carteira")
+                      {
+                        pnsubsit <- subset((pnsuba), (especificacao == "Trabalhador doméstico sem carteira de trabalho assinada") )
+                      }
+                      else
+                      {
+                        pnsubsit <- subset((pnsuba), (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") | 
+                                             (especificacao == "Trabalhador doméstico sem carteira de trabalho assinada") )
+                      }
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                  atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                  numeros(pnsubsit),";", 
+                                  rendas(pnsubsit),";",
+                                  "\n" ),
+                           file = arquivo_saida,
+                           append = TRUE)
+                    }
+                  }
+                  else if (posicao_ == "Trabalhador familiar auxiliar")
+                  {
+                    situacao_ <- ""
+                    pnsubsit <- subset((pnsuba), (especificacao == "Trabalhador familiar auxiliar") )
+                    
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                numeros(pnsubsit),";", 
+                                rendas(pnsubsit),";",
+                                "\n" ),
+                         file = arquivo_saida,
+                         append = TRUE)
+                    
+                  }
+                  else if (posicao_ == "Formal")
+                  {
+                    situacao_ <- ""
+                    pnsubsit <- subset((pnsuba), (especificacao == "Empregado no setor privado com carteira de trabalho assinada") |
+                                         (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") |
+                                         (especificacao == "Empregado no setor público com carteira de trabalho assinada") |
+                                         (especificacao == "Empregado no setor público sem carteira de trabalho assinada") |
+                                         (especificacao == "Militar e servidor estatutário") |
+                                         (especificacao == "Empregador" & CNPJ == "Sim") |
+                                         (especificacao == "Conta-própria" & CNPJ == "Sim"))
+                    
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                numeros(pnsubsit),";", 
+                                rendas(pnsubsit),";",
+                                "\n" ),
+                         file = arquivo_saida,
+                         append = TRUE)
+                  }
+                  else if (posicao_ == "Informal")
+                  {
+                    situacao_ <- ""
+                    pnsubsit <- subset((pnsuba), (especificacao == "Empregado no setor privado sem carteira de trabalho assinada") |
+                                         (especificacao == "Trabalhador doméstico sem carteira de trabalho assinada") |
+                                         (especificacao == "Empregador" & CNPJ == "Não") |
+                                         (especificacao == "Conta-própria" & CNPJ == "Não") |
+                                         (especificacao == "Trabalhador familiar auxiliar") )
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                numeros(pnsubsit),";", 
+                                rendas(pnsubsit),";",
+                                "\n" ),
+                         file = arquivo_saida,
+                         append = TRUE)
+                  }
+                }
+              }
+              
+              # Setor econômico da atividade
+              #pnsuba <- subset(pnsubp,  ( (atividade_ == "") | (atividade == atividade_ ) ) )  
+              for (grupamento_ in todos_grupamentos)
+              {
+                atividade_ = ""
+                if (grupamento_ == "A: Agricultura, pecuária, produção florestal, pesca e aquicultura") atividade_ <- "Agricultura, pecuária, produção florestal, pesca e aquicultura"
+                if (grupamento_ == "B: Indústrias extrativas") atividade_ <- "Indústria"
+                if (grupamento_ == "C: Indústrias de transformação") atividade_ <- "Indústria"
+                if (grupamento_ == "D: Eletricidade e gás") atividade_ <- "Indústria"
+                if (grupamento_ == "E: Água, esgoto, atividades de gestão de resíduos e descontaminação") atividade_ <- "Indústria"
+                if (grupamento_ == "F: Construção") atividade_ <- "Construção"
+                if (grupamento_ == "G: Comércio, reparação de veículos automotores e motocicletas") atividade_ <- "Comércio, reparação de veículos automotores e motocicletas"
+                if (grupamento_ == "H: Transporte, armazenagem e correio") atividade_ <- "Transporte, armazenagem e correio"
+                if (grupamento_ == "I: Alojamento e alimentação") atividade_ <- "Alojamento e alimentação"
+                if (grupamento_ == "J: Informação e comunicação") atividade_ <- "Informação, comunicação e atividades financeiras, imobiliárias, profissionais e administrativas" 
+                if (grupamento_ == "K: Atividades financeiras, de seguro e serviços relacionados") atividade_ <- "Informação, comunicação e atividades financeiras, imobiliárias, profissionais e administrativas"
+                if (grupamento_ == "L: Atividades imobiliárias") atividade_ <- "Informação, comunicação e atividades financeiras, imobiliárias, profissionais e administrativas"
+                if (grupamento_ == "M: Atividades profissionais, científicas e técnicas") atividade_ <- "Informação, comunicação e atividades financeiras, imobiliárias, profissionais e administrativas"
+                if (grupamento_ == "N: Atividades administrativas e serviços complementares") atividade_ <- "Informação, comunicação e atividades financeiras, imobiliárias, profissionais e administrativas"
+                if (grupamento_ == "O: Administração pública, defesa e seguridade social") atividade_ <- "Administração pública, defesa e seguridade social, educação, saúde humana e serviços sociais"
+                if (grupamento_ == "P: Educação") atividade_ <- "Administração pública, defesa e seguridade social, educação, saúde humana e serviços sociais"
+                if (grupamento_ == "Q: Saúde humana e serviços sociais") atividade_ <- "Administração pública, defesa e seguridade social, educação, saúde humana e serviços sociais"
+                if (grupamento_ == "R: Artes, cultura, esporte e recreação") atividade_ <- "Outros serviços"
+                if (grupamento_ == "S: Outras atividades de serviço") atividade_ <- "Outros serviços"
+                if (grupamento_ == "T: Serviços domésticos") atividade_ <- "Serviços domésticos"
+                if (grupamento_ == "U: Organismos internacionais e outras instituições extraterritoriais") atividade_ <- "Outros serviços"
+                if (grupamento_ == "V: Atividades maldefinidas") atividade_ <- "Atividades maldefinidas"
+                
+                pnsubg <- subset(pnsubraca,  ( (grupamento_ == "") | (grupamento == grupamento_ ) ) )  
+
+                for (posicao_ in posicao_na_ocupacao)
+                {
+                  
+                  if (posicao_ == "")
+                  {
+                    situacao_ <- ""
+                    pnsubsit <- pnsubg
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                numeros(pnsubsit),";", 
+                                rendas(pnsubsit),";",
+                                "\n" ),
+                         file = arquivo_saida,
+                         append = TRUE)
+                  }
+                  
+                  else if (posicao_ == "Empregado")
+                  {
+                    for (situacao_ in situacao_empregado)
+                    {
+                      
+                      if (situacao_ == "Setor privado com carteira")
+                      {
+                        pnsubsit <- subset((pnsubraca), (especificacao == "Empregado no setor privado com carteira de trabalho assinada") )
+                      }
+                      else if (situacao_ == "Setor privado sem carteira")
+                      {
+                        pnsubsit <- subset((pnsubraca), (especificacao == "Empregado no setor privado sem carteira de trabalho assinada") )
+                      }
+                      else if (situacao_ == "Setor público com carteira")
+                      {
+                        pnsubsit <- subset((pnsubraca), (especificacao == "Empregado no setor público com carteira de trabalho assinada") )
+                      }
+                      else if (situacao_ == "Setor público sem carteira")
+                      {
+                        pnsubsit <- subset((pnsubraca), (especificacao == "Empregado no setor público sem carteira de trabalho assinada") )
+                      }
+                      else if (situacao_ == "Militar e servidor estatutário")
+                      {
+                        pnsubsit <- subset((pnsubraca), (especificacao == "Militar e servidor estatutário") )
+                      }
+                      else
+                      {
+                        pnsubsit <- subset((pnsubraca), (funcao == "Trabalhador doméstico") |
+                                             (funcao == "Militar do exército, da marinha, da aeronáutica, da polícia militar ou do corpo de bombeiros militar") |
+                                             (funcao == "Empregado do setor privado") |
+                                             (funcao == "Empregado do setor público (inclusive empresas de economia mista)") )
+                      }
+                      
+                      
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                  atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                  numeros(pnsubsit),";", 
+                                  rendas(pnsubsit),";",
+                                  "\n" ),
+                           file = arquivo_saida,
+                           append = TRUE)
+                    }
+                  }
+                  else if (posicao_ == "Empregador")
+                  {
+                    for (situacao_ in situacao_empregador)
+                    {
+                      if (situacao_ == "Com CNPJ")
+                      {
+                        pnsubsit <- subset((pnsubraca), (funcao == "Empregador") & (CNPJ == "Sim") )
+                      }
+                      else if (situacao_ == "Sem CNPJ")
+                      {
+                        pnsubsit <- subset((pnsubraca), (funcao == "Empregador") & (CNPJ == "Não") )
+                      }
+                      else
+                      {
+                        pnsubsit <- subset((pnsubraca), (funcao == "Empregador") )
+                      }
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                  atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                  numeros(pnsubsit),";", 
+                                  rendas(pnsubsit),";",
+                                  "\n" ),
+                           file = arquivo_saida,
+                           append = TRUE)
+                    }
+                  }
+                  else if (posicao_ == "Conta própria")
+                  {
+                    for (situacao_ in situacao_empregador)
+                    {
+                      if (situacao_ == "Com CNPJ")
+                      {
+                        pnsubsit <- subset((pnsubraca), (funcao == "Conta própria") & (CNPJ == "Sim") )
+                      }
+                      else if (situacao_ == "Sem CNPJ")
+                      {
+                        pnsubsit <- subset((pnsubraca), (funcao == "Conta própria") & (CNPJ == "Não") )
+                      }
+                      else
+                      {
+                        pnsubsit <- subset((pnsubraca), (funcao == "Conta própria") )
+                      }
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                  atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                  numeros(pnsubsit),";", 
+                                  rendas(pnsubsit),";",
+                                  "\n" ),
+                           file = arquivo_saida,
+                           append = TRUE)
+                    }
+                  }
+                  else if (posicao_ == "Trabalhador doméstico")
+                  {
+                    for (situacao_ in situacao_domestico)
+                    {
+                      if (situacao_ == "Trabalhador doméstico com carteira")
+                      {
+                        pnsubsit <- subset((pnsubraca), (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") )
+                      }
+                      else if (situacao_ == "Trabalhador doméstico sem carteira")
+                      {
+                        pnsubsit <- subset((pnsubraca), (especificacao == "Trabalhador doméstico sem carteira de trabalho assinada") )
+                      }
+                      else
+                      {
+                        pnsubsit <- subset((pnsubraca), (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") | 
+                                             (especificacao == "Trabalhador doméstico sem carteira de trabalho assinada") )
+                      }
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                  atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                  numeros(pnsubsit),";", 
+                                  rendas(pnsubsit),";",
+                                  "\n" ),
+                           file = arquivo_saida,
+                           append = TRUE)
+                    }
+                  }
+                  else if (posicao_ == "Trabalhador familiar auxiliar")
+                  {
+                    situacao_ <- ""
+                    pnsubsit <- subset((pnsubraca), (especificacao == "Trabalhador familiar auxiliar") )
+                    
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                numeros(pnsubsit),";", 
+                                rendas(pnsubsit),";",
+                                "\n" ),
+                         file = arquivo_saida,
+                         append = TRUE)
+                    
+                  }
+                  else if (posicao_ == "Formal")
+                  {
+                    situacao_ <- ""
+                    pnsubsit <- subset((pnsubraca), (especificacao == "Empregado no setor privado com carteira de trabalho assinada") |
+                                         (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") |
+                                         (especificacao == "Empregado no setor público com carteira de trabalho assinada") |
+                                         (especificacao == "Empregado no setor público sem carteira de trabalho assinada") |
+                                         (especificacao == "Militar e servidor estatutário") |
+                                         (especificacao == "Empregador" & CNPJ == "Sim") |
+                                         (especificacao == "Conta-própria" & CNPJ == "Sim"))
+                    
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                numeros(pnsubsit),";", 
+                                rendas(pnsubsit),";",
+                                "\n" ),
+                         file = arquivo_saida,
+                         append = TRUE)
+                  }
+                  else if (posicao_ == "Informal")
+                  {
+                    situacao_ <- ""
+                    pnsubsit <- subset((pnsubraca), (especificacao == "Empregado no setor privado sem carteira de trabalho assinada") |
+                                         (especificacao == "Trabalhador doméstico sem carteira de trabalho assinada") |
+                                         (especificacao == "Empregador" & CNPJ == "Não") |
+                                         (especificacao == "Conta-própria" & CNPJ == "Não") |
+                                         (especificacao == "Trabalhador familiar auxiliar") )
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                                atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
+                                numeros(pnsubsit),";", 
+                                rendas(pnsubsit),";",
+                                "\n" ),
+                         file = arquivo_saida,
+                         append = TRUE)
+                  }
+                }
+              }
+            
+          }  
+        }
+      }
+    }  
   }
 }
 
