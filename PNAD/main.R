@@ -185,19 +185,19 @@ combinar_csv("^resultado_fora_da_forca_", "agregado_resultado_fora_da_forca_2016
 
 
 # Gerar resultado por posicao na ocupação
-rosto("Posição na ocupação X Grupamento de atividades", "_resultado_pno_grupamento 0.csv")
+rosto("Posição na ocupação X Grupamento de atividades", "_resultado_pno_cnae 0.csv")
 foreach(ano=2016:2024,  .packages=c('dplyr', 'tidyr')) %dopar%
   {
     for (pnad in pnads[ano-ano_inicial+1])
     {
       if (ano < 2020)
-        gerar_posicao_na_ocupacao(pnad, paste("_resultado_pno_grupamento", ano, ".csv"))
+        gerar_posicao_na_ocupacao(pnad, paste("_resultado_pno_cnae", ano, ".csv"))
       else
-        gerar_posicao_na_ocupacao(pnad, paste("resultado_pno_grupamento", ano, ".csv"))
+        gerar_posicao_na_ocupacao(pnad, paste("resultado_pno_cnae", ano, ".csv"))
     }
   }
-combinar_csv("^_resultado_posicao_na_ocupacao_", "agregado_resultado_posicao_na_ocupacao_2016_2019.xlsx")
-combinar_csv("^resultado_posicao_na_ocupacao_", "agregado_resultado_posicao_na_ocupacao_2020_2024.xlsx")
+combinar_csv("^_resultado_pno_cnae_", "agregado_resultado_pno_cnae_2016_2019.xlsx")
+combinar_csv("^resultado_pno_cnae_", "agregado_resultado_pno_cnae_2020_2024.xlsx")
 
 
 
