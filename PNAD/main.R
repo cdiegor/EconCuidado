@@ -191,9 +191,9 @@ foreach(ano=2016:2024,  .packages=c('dplyr', 'tidyr')) %dopar%
     for (pnad in pnads[ano-ano_inicial+1])
     {
       if (ano < 2020)
-        gerar_posicao_na_ocupacao(pnad, paste("_resultado_pno_cnae", ano, ".csv"))
+        gerar_pno_cnae(pnad, paste("_resultado_pno_cnae", ano, ".csv"))
       else
-        gerar_posicao_na_ocupacao(pnad, paste("resultado_pno_cnae", ano, ".csv"))
+        gerar_pno_cnae(pnad, paste("resultado_pno_cnae", ano, ".csv"))
     }
   }
 combinar_csv("^_resultado_pno_cnae_", "agregado_resultado_pno_cnae_2016_2019.xlsx")

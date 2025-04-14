@@ -1785,8 +1785,46 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
   situacao_empregador = c("", "Com CNPJ", "Sem CNPJ")
   situacao_contapropria = c("", "Com CNPJ", "Sem CNPJ")
   
+
+  todas_atividades = c("",
+                       "Agricultura, pecuária, produção florestal, pesca e aquicultura",
+                       "Indústria",
+                       "Construção",
+                       "Comércio, reparação de veículos automotores e motocicletas",
+                       "Transporte, armazenagem e correio",
+                       "Alojamento e alimentação",
+                       "Informação, comunicação e atividades financeiras, imobiliárias, profissionais e administrativas",
+                       "Administração pública, defesa e seguridade social, educação, saúde humana e serviços sociais",
+                       "Outros serviços",
+                       "Serviços domésticos")
+  todos_grupamentos = c("",
+                        "A: Agricultura, pecuária, produção florestal, pesca e aquicultura",
+                        "B: Indústrias extrativas",
+                        "C: Indústrias de transformação",
+                        "D: Eletricidade e gás",
+                        "E: Água, esgoto, atividades de gestão de resíduos e descontaminação",
+                        "F: Construção",
+                        "G: Comércio, reparação de veículos automotores e motocicletas",
+                        "H: Transporte, armazenagem e correio",
+                        "I: Alojamento e alimentação",
+                        "J: Informação e comunicação",
+                        "K: Atividades financeiras, de seguro e serviços relacionados",
+                        "L: Atividades imobiliárias",
+                        "M: Atividades profissionais, científicas e técnicas",
+                        "N: Atividades administrativas e serviços complementares",
+                        "O: Administração pública, defesa e seguridade social",
+                        "P: Educação",
+                        "Q: Saúde humana e serviços sociais",
+                        "R: Artes, cultura, esporte e recreação",
+                        "S: Outras atividades de serviço",
+                        "T: Serviços domésticos",
+                        "U: Organismos internacionais e outras instituições extraterritoriais",
+                        "V: Atividades maldefinidas"
+  )
   
-  cat ( paste ("Fonte;", "Local;", "Sexo;", "Faixa etária;", "Nível de instrução;", "Raça;", 
+  
+    
+  cat ( paste ("Fonte;", "Local;", "Sexo;", "Faixa etária;", "Raça;", 
                "Principal atividade;", "Grupamento;", "Posição;", "Situação;",
                "Amostra;", "Pessoas em idade ativa;", "Pessoas ocupadas;", "Força de trabalho;", 
                "Renda habitual principal;", "Renda efetiva principal;", "Renda habitual total;", "Renda efetiva total;", 
@@ -1840,7 +1878,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
               }
               else
               {
-                pnsubraca <- subset(pnsubnivel,  ( (raca_ == "") | (raca == raca_ ) ) )
+                pnsubraca <- subset(pnsubfaixa,  ( (raca_ == "") | (raca == raca_ ) ) )
               }
 
               
@@ -1860,7 +1898,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                   {
                     situacao_ <- ""
                     pnsubsit <- pnsuba
-                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                 atividade_,  ";", grupamento_,  ";", posicao_, ";", situacao_, ";", 
                                 numeros(pnsubsit),";", 
                                 rendas(pnsubsit),";",
@@ -1903,7 +1941,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                       }
                       
                       
-                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                   atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                   numeros(pnsubsit),";", 
                                   rendas(pnsubsit),";",
@@ -1928,7 +1966,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                       {
                         pnsubsit <- subset((pnsuba), (funcao == "Empregador") )
                       }
-                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                   atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                   taxas(pnsubsit),";", 
                                   rendas(pnsubsit),";",
@@ -1953,7 +1991,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                       {
                         pnsubsit <- subset((pnsuba), (funcao == "Conta própria") )
                       }
-                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                   atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                   numeros(pnsubsit),";", 
                                   rendas(pnsubsit),";",
@@ -1979,7 +2017,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                         pnsubsit <- subset((pnsuba), (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") | 
                                              (especificacao == "Trabalhador doméstico sem carteira de trabalho assinada") )
                       }
-                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                   atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                   numeros(pnsubsit),";", 
                                   rendas(pnsubsit),";",
@@ -1993,7 +2031,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                     situacao_ <- ""
                     pnsubsit <- subset((pnsuba), (especificacao == "Trabalhador familiar auxiliar") )
                     
-                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                 atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                 numeros(pnsubsit),";", 
                                 rendas(pnsubsit),";",
@@ -2013,7 +2051,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                                          (especificacao == "Empregador" & CNPJ == "Sim") |
                                          (especificacao == "Conta-própria" & CNPJ == "Sim"))
                     
-                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                 atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                 numeros(pnsubsit),";", 
                                 rendas(pnsubsit),";",
@@ -2029,7 +2067,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                                          (especificacao == "Empregador" & CNPJ == "Não") |
                                          (especificacao == "Conta-própria" & CNPJ == "Não") |
                                          (especificacao == "Trabalhador familiar auxiliar") )
-                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                 atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                 numeros(pnsubsit),";", 
                                 rendas(pnsubsit),";",
@@ -2077,7 +2115,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                   {
                     situacao_ <- ""
                     pnsubsit <- pnsubg
-                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                 atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                 numeros(pnsubsit),";", 
                                 rendas(pnsubsit),";",
@@ -2120,7 +2158,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                       }
                       
                       
-                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                   atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                   numeros(pnsubsit),";", 
                                   rendas(pnsubsit),";",
@@ -2145,7 +2183,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                       {
                         pnsubsit <- subset((pnsubraca), (funcao == "Empregador") )
                       }
-                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                   atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                   numeros(pnsubsit),";", 
                                   rendas(pnsubsit),";",
@@ -2170,7 +2208,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                       {
                         pnsubsit <- subset((pnsubraca), (funcao == "Conta própria") )
                       }
-                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                   atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                   numeros(pnsubsit),";", 
                                   rendas(pnsubsit),";",
@@ -2196,7 +2234,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                         pnsubsit <- subset((pnsubraca), (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") | 
                                              (especificacao == "Trabalhador doméstico sem carteira de trabalho assinada") )
                       }
-                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                      cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                   atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                   numeros(pnsubsit),";", 
                                   rendas(pnsubsit),";",
@@ -2210,7 +2248,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                     situacao_ <- ""
                     pnsubsit <- subset((pnsubraca), (especificacao == "Trabalhador familiar auxiliar") )
                     
-                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                 atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                 numeros(pnsubsit),";", 
                                 rendas(pnsubsit),";",
@@ -2230,7 +2268,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                                          (especificacao == "Empregador" & CNPJ == "Sim") |
                                          (especificacao == "Conta-própria" & CNPJ == "Sim"))
                     
-                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                 atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                 numeros(pnsubsit),";", 
                                 rendas(pnsubsit),";",
@@ -2246,7 +2284,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                                          (especificacao == "Empregador" & CNPJ == "Não") |
                                          (especificacao == "Conta-própria" & CNPJ == "Não") |
                                          (especificacao == "Trabalhador familiar auxiliar") )
-                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", nivel_instrucao_, ";", raca_, ";", 
+                    cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                 atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
                                 numeros(pnsubsit),";", 
                                 rendas(pnsubsit),";",
