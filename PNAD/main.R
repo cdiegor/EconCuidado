@@ -196,8 +196,8 @@ foreach(ano=2016:2024,  .packages=c('dplyr', 'tidyr')) %dopar%
         gerar_pno_cnae(pnad, paste("resultado_pno_cnae", ano, ".csv"))
     }
   }
-combinar_csv("^_resultado_pno_cnae_", "agregado_resultado_pno_cnae_2016_2019.xlsx")
-combinar_csv("^resultado_pno_cnae_", "agregado_resultado_pno_cnae_2020_2024.xlsx")
+combinar_csv("^_resultado_pno_cnae ", "agregado_resultado_pno_cnae_2016_2019.xlsx")
+combinar_csv("^resultado_pno_cnae ", "agregado_resultado_pno_cnae_2020_2024.xlsx")
 
 
 

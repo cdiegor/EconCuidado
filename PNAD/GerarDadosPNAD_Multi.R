@@ -1968,7 +1968,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                       }
                       cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                   atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
-                                  taxas(pnsubsit),";", 
+                                  numeros(pnsubsit),";", 
                                   rendas(pnsubsit),";",
                                   "\n" ),
                            file = arquivo_saida,
@@ -2131,27 +2131,27 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                       
                       if (situacao_ == "Setor privado com carteira")
                       {
-                        pnsubsit <- subset((pnsubraca), (especificacao == "Empregado no setor privado com carteira de trabalho assinada") )
+                        pnsubsit <- subset((pnsubg), (especificacao == "Empregado no setor privado com carteira de trabalho assinada") )
                       }
                       else if (situacao_ == "Setor privado sem carteira")
                       {
-                        pnsubsit <- subset((pnsubraca), (especificacao == "Empregado no setor privado sem carteira de trabalho assinada") )
+                        pnsubsit <- subset((pnsubg), (especificacao == "Empregado no setor privado sem carteira de trabalho assinada") )
                       }
                       else if (situacao_ == "Setor público com carteira")
                       {
-                        pnsubsit <- subset((pnsubraca), (especificacao == "Empregado no setor público com carteira de trabalho assinada") )
+                        pnsubsit <- subset((pnsubg), (especificacao == "Empregado no setor público com carteira de trabalho assinada") )
                       }
                       else if (situacao_ == "Setor público sem carteira")
                       {
-                        pnsubsit <- subset((pnsubraca), (especificacao == "Empregado no setor público sem carteira de trabalho assinada") )
+                        pnsubsit <- subset((pnsubg), (especificacao == "Empregado no setor público sem carteira de trabalho assinada") )
                       }
                       else if (situacao_ == "Militar e servidor estatutário")
                       {
-                        pnsubsit <- subset((pnsubraca), (especificacao == "Militar e servidor estatutário") )
+                        pnsubsit <- subset((pnsubg), (especificacao == "Militar e servidor estatutário") )
                       }
                       else
                       {
-                        pnsubsit <- subset((pnsubraca), (funcao == "Trabalhador doméstico") |
+                        pnsubsit <- subset((pnsubg), (funcao == "Trabalhador doméstico") |
                                              (funcao == "Militar do exército, da marinha, da aeronáutica, da polícia militar ou do corpo de bombeiros militar") |
                                              (funcao == "Empregado do setor privado") |
                                              (funcao == "Empregado do setor público (inclusive empresas de economia mista)") )
@@ -2173,15 +2173,15 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                     {
                       if (situacao_ == "Com CNPJ")
                       {
-                        pnsubsit <- subset((pnsubraca), (funcao == "Empregador") & (CNPJ == "Sim") )
+                        pnsubsit <- subset((pnsubg), (funcao == "Empregador") & (CNPJ == "Sim") )
                       }
                       else if (situacao_ == "Sem CNPJ")
                       {
-                        pnsubsit <- subset((pnsubraca), (funcao == "Empregador") & (CNPJ == "Não") )
+                        pnsubsit <- subset((pnsubg), (funcao == "Empregador") & (CNPJ == "Não") )
                       }
                       else
                       {
-                        pnsubsit <- subset((pnsubraca), (funcao == "Empregador") )
+                        pnsubsit <- subset((pnsubg), (funcao == "Empregador") )
                       }
                       cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                   atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
@@ -2198,15 +2198,15 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                     {
                       if (situacao_ == "Com CNPJ")
                       {
-                        pnsubsit <- subset((pnsubraca), (funcao == "Conta própria") & (CNPJ == "Sim") )
+                        pnsubsit <- subset((pnsubg), (funcao == "Conta própria") & (CNPJ == "Sim") )
                       }
                       else if (situacao_ == "Sem CNPJ")
                       {
-                        pnsubsit <- subset((pnsubraca), (funcao == "Conta própria") & (CNPJ == "Não") )
+                        pnsubsit <- subset((pnsubg), (funcao == "Conta própria") & (CNPJ == "Não") )
                       }
                       else
                       {
-                        pnsubsit <- subset((pnsubraca), (funcao == "Conta própria") )
+                        pnsubsit <- subset((pnsubg), (funcao == "Conta própria") )
                       }
                       cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                   atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
@@ -2223,15 +2223,15 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                     {
                       if (situacao_ == "Trabalhador doméstico com carteira")
                       {
-                        pnsubsit <- subset((pnsubraca), (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") )
+                        pnsubsit <- subset((pnsubg), (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") )
                       }
                       else if (situacao_ == "Trabalhador doméstico sem carteira")
                       {
-                        pnsubsit <- subset((pnsubraca), (especificacao == "Trabalhador doméstico sem carteira de trabalho assinada") )
+                        pnsubsit <- subset((pnsubg), (especificacao == "Trabalhador doméstico sem carteira de trabalho assinada") )
                       }
                       else
                       {
-                        pnsubsit <- subset((pnsubraca), (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") | 
+                        pnsubsit <- subset((pnsubg), (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") | 
                                              (especificacao == "Trabalhador doméstico sem carteira de trabalho assinada") )
                       }
                       cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
@@ -2246,7 +2246,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                   else if (posicao_ == "Trabalhador familiar auxiliar")
                   {
                     situacao_ <- ""
-                    pnsubsit <- subset((pnsubraca), (especificacao == "Trabalhador familiar auxiliar") )
+                    pnsubsit <- subset((pnsubg), (especificacao == "Trabalhador familiar auxiliar") )
                     
                     cat( paste (pnadf, ";", local_, ";", sexo_, ";", faixa_etaria_, ";", raca_, ";", 
                                 atividade_,  ";", grupamento_,  ";",posicao_, ";", situacao_, ";", 
@@ -2260,7 +2260,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                   else if (posicao_ == "Formal")
                   {
                     situacao_ <- ""
-                    pnsubsit <- subset((pnsubraca), (especificacao == "Empregado no setor privado com carteira de trabalho assinada") |
+                    pnsubsit <- subset((pnsubg), (especificacao == "Empregado no setor privado com carteira de trabalho assinada") |
                                          (especificacao == "Trabalhador doméstico com carteira de trabalho assinada") |
                                          (especificacao == "Empregado no setor público com carteira de trabalho assinada") |
                                          (especificacao == "Empregado no setor público sem carteira de trabalho assinada") |
@@ -2279,7 +2279,7 @@ gerar_pno_cnae <- function(pnads, arquivo_saida)
                   else if (posicao_ == "Informal")
                   {
                     situacao_ <- ""
-                    pnsubsit <- subset((pnsubraca), (especificacao == "Empregado no setor privado sem carteira de trabalho assinada") |
+                    pnsubsit <- subset((pnsubg), (especificacao == "Empregado no setor privado sem carteira de trabalho assinada") |
                                          (especificacao == "Trabalhador doméstico sem carteira de trabalho assinada") |
                                          (especificacao == "Empregador" & CNPJ == "Não") |
                                          (especificacao == "Conta-própria" & CNPJ == "Não") |
